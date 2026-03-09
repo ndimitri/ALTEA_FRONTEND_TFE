@@ -1,0 +1,52 @@
+<div class="page-container">
+  <h2>Administration</h2>
+
+  <mat-card class="users-card">
+    <mat-card-header><mat-card-title>Utilisateurs ({{ users.length }})</mat-card-title></mat-card-header>
+    <mat-card-content>
+      <table mat-table [dataSource]="users" class="users-table">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Utilisateur</th>
+          <td mat-cell *matCellDef="let u">
+            <div class="user-cell">
+              <div class="avatar-sm">{{ u.prenom[0] }}{{ u.nom[0] }}</div>
+              <div>
+                <div>{{ u.prenom }} {{ u.nom }}</div>
+                <small>{{ u.email }}</small>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="role">
+          <th mat-header-cell *matHeaderCellDef>Rôle</th>
+          <td mat-cell *matCellDef="let u">
+            <mat-chip [color]="u.role === 'ROLE_ADMIN' ? 'warn' : 'primary'" highlighted>
+              {{ u.role === 'ROLE_ADMIN' ? 'Admin' : 'Utilisateur' }}
+            </mat-chip>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="modules">
+          <th mat-header-cell *matHeaderCellDef>Modules</th>
+          <td mat-cell *matCellDef="let u">
+            <div class="module-toggles">
+              <button *ngFor="let m of allModules" mat-stroked-button
+                      [color]="isModuleActive(u.id, m.id) ? 'primary' : ''"
+                      (click)="toggleModule(u.id, m.id)"
+                      class="module-btn">
+                {{ getModuleShort(m.nom) }}
+              </button>
+            </div>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="actif">
+          <th mat-header-cell *matHeaderCellDef>Actif</th>
+          <td mat-cell *matCellDef="let u">
+            <mat-slide-toggle [checked]="u.actif" (change)="toggleUser(u.id)"></mat-slide-toggle>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedCols"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedCols;"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,27 @@
+.dashboard-container { padding: 24px; }
+.welcome-banner { margin-bottom: 24px; }
+.welcome-banner h2 { margin: 0; font-size: 26px; color: #0D3B66; }
+.welcome-banner p { margin: 4px 0 0; color: #666; font-size: 14px; text-transform: capitalize; }
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.kpi-card { padding: 20px; cursor: pointer; transition: box-shadow 0.2s, transform 0.2s; text-align: center; }
+.kpi-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.12); transform: translateY(-2px); }
+.kpi-icon { font-size: 40px; width: 40px; height: 40px; margin-bottom: 8px; }
+.patients-icon { color: #1F5C8B; }
+.rdv-icon { color: #4CAF50; }
+.week-icon { color: #FF9800; }
+.map-icon { color: #9C27B0; }
+.kpi-value { font-size: 32px; font-weight: 700; color: #0D3B66; }
+.kpi-label { font-size: 13px; color: #888; margin-top: 4px; }
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+mat-card-header { display: flex; justify-content: space-between; align-items: center; }
+.empty-small { text-align: center; padding: 16px; color: #aaa; }
+.modules-list { display: flex; flex-direction: column; gap: 8px; }
+.module-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; color: #888; }
+.module-item.active { color: #0D3B66; }
+.module-item mat-icon:first-child { color: #1F5C8B; }
+.module-item span { flex: 1; font-size: 14px; }
+.status-icon { font-size: 18px; }
+.quick-actions { display: flex; flex-direction: column; gap: 12px; }
+.quick-actions button { justify-content: flex-start; }
+@media (max-width: 1024px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } .bottom-grid { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }

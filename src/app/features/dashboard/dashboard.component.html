@@ -1,0 +1,90 @@
+<div class="dashboard-container">
+  <div class="welcome-banner">
+    <div>
+      <h2>Bonjour, {{ user?.prenom }} 👋</h2>
+      <p>{{ today | date:'EEEE d MMMM yyyy' }}</p>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <mat-card class="kpi-card" routerLink="/patients">
+      <mat-icon class="kpi-icon patients-icon">people</mat-icon>
+      <div class="kpi-value">{{ patientCount }}</div>
+      <div class="kpi-label">Patients</div>
+    </mat-card>
+    <mat-card class="kpi-card" routerLink="/planning">
+      <mat-icon class="kpi-icon rdv-icon">event</mat-icon>
+      <div class="kpi-value">{{ todayRdvCount }}</div>
+      <div class="kpi-label">RDV aujourd'hui</div>
+    </mat-card>
+    <mat-card class="kpi-card" routerLink="/planning">
+      <mat-icon class="kpi-icon week-icon">date_range</mat-icon>
+      <div class="kpi-value">{{ weekRdvCount }}</div>
+      <div class="kpi-label">RDV cette semaine</div>
+    </mat-card>
+    <mat-card class="kpi-card" routerLink="/map">
+      <mat-icon class="kpi-icon map-icon">map</mat-icon>
+      <div class="kpi-value">{{ activeModules }}</div>
+      <div class="kpi-label">Modules actifs</div>
+    </mat-card>
+  </div>
+
+  <div class="bottom-grid">
+    <!-- Prochains rendez-vous -->
+    <mat-card class="rdv-card">
+      <mat-card-header>
+        <mat-card-title>Prochains rendez-vous</mat-card-title>
+        <button mat-button routerLink="/planning">Voir tout</button>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-list *ngIf="upcomingRdv.length > 0">
+          <mat-list-item *ngFor="let rdv of upcomingRdv">
+            <div matListItemIcon [style.background]="rdv.couleur"
+                 style="width:10px;height:10px;border-radius:50%"></div>
+            <div matListItemTitle>{{ rdv.patientPrenom }} {{ rdv.patientNom }}</div>
+            <div matListItemLine>{{ rdv.dateHeureDebut | date:'EEE dd/MM HH:mm' }}</div>
+          </mat-list-item>
+        </mat-list>
+        <div class="empty-small" *ngIf="upcomingRdv.length === 0">
+          <p>Aucun rendez-vous à venir</p>
+          <button mat-button color="primary" routerLink="/planning">Planifier</button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Modules actifs -->
+    <mat-card class="modules-card">
+      <mat-card-header><mat-card-title>Mes modules</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <div class="modules-list">
+          <div *ngFor="let m of modules" class="module-item" [class.active]="m.activeForUser">
+            <mat-icon>{{ getModuleIcon(m.nom) }}</mat-icon>
+            <span>{{ getModuleLabel(m.nom) }}</span>
+            <mat-icon class="status-icon" [color]="m.activeForUser ? 'primary' : ''">
+              {{ m.activeForUser ? 'check_circle' : 'radio_button_unchecked' }}
+            </mat-icon>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Actions rapides -->
+    <mat-card class="actions-card">
+      <mat-card-header><mat-card-title>Actions rapides</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <div class="quick-actions">
+          <button mat-raised-button color="primary" routerLink="/patients/new">
+            <mat-icon>person_add</mat-icon> Nouveau patient
+          </button>
+          <button mat-raised-button color="accent" routerLink="/planning">
+            <mat-icon>event_available</mat-icon> Planifier RDV
+          </button>
+          <button mat-stroked-button routerLink="/map">
+            <mat-icon>directions_car</mat-icon> Ma tournée
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

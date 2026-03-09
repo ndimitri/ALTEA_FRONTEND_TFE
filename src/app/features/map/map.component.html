@@ -1,0 +1,64 @@
+<div class="map-container">
+  <div class="map-sidebar">
+    <mat-card class="sidebar-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>map</mat-icon> Carte & Tournées
+        </mat-card-title>
+        <mat-card-subtitle>{{ patients.length }} patients géolocalisés</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+
+        <div class="action-buttons">
+          <button mat-raised-button color="primary" (click)="calculateRoute()" [disabled]="selectedPatients.length < 2 || loadingRoute">
+            <mat-spinner diameter="16" *ngIf="loadingRoute"></mat-spinner>
+            <mat-icon *ngIf="!loadingRoute">directions</mat-icon>
+            Calculer l'itinéraire
+          </button>
+          <button mat-button (click)="clearRoute()" *ngIf="routeInfo">
+            <mat-icon>clear</mat-icon> Effacer
+          </button>
+        </div>
+
+        <!-- Infos route -->
+        <div class="route-info" *ngIf="routeInfo">
+          <mat-chip-set>
+            <mat-chip><mat-icon>straighten</mat-icon> {{ routeInfo.distance }} km</mat-chip>
+            <mat-chip><mat-icon>schedule</mat-icon> {{ routeInfo.duration }} min</mat-chip>
+          </mat-chip-set>
+        </div>
+
+        <p class="hint" *ngIf="selectedPatients.length < 2">
+          <mat-icon>info</mat-icon>
+          Sélectionnez au moins 2 patients pour calculer l'itinéraire
+        </p>
+
+        <h4>Patients ({{ patients.length }})</h4>
+        <mat-selection-list [(ngModel)]="selectedPatients" (ngModelChange)="onSelectionChange()"
+                            [ngModelOptions]="{standalone: true}">
+          <mat-list-option *ngFor="let p of patients; let i = index" [value]="p">
+            <div class="patient-item">
+              <div class="patient-num">{{ i + 1 }}</div>
+              <div>
+                <div class="patient-name">{{ p.prenom }} {{ p.nom }}</div>
+                <div class="patient-addr" *ngIf="p.adresse">{{ p.adresse }}</div>
+              </div>
+            </div>
+          </mat-list-option>
+        </mat-selection-list>
+
+        <div class="no-patients" *ngIf="patients.length === 0">
+          <mat-icon>person_pin</mat-icon>
+          <p>Aucun patient géolocalisé.<br>Ajoutez des coordonnées dans les fiches patients.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="map-main">
+    <div id="altea-map" class="leaflet-map"></div>
+    <div class="map-loading" *ngIf="loadingPatients">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h2>Mes Patients</h2>
+      <p class="subtitle">{{ patients.length }} patient(s)</p>
+    </div>
+    <button mat-raised-button color="primary" routerLink="/patients/new">
+      <mat-icon>person_add</mat-icon> Nouveau patient
+    </button>
+  </div>
+
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Rechercher un patient</mat-label>
+    <input matInput [(ngModel)]="searchTerm" (ngModelChange)="onSearch($event)" placeholder="Nom, prénom...">
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
+  <div class="loading" *ngIf="loading"><mat-spinner diameter="40"></mat-spinner></div>
+
+  <div class="patients-grid" *ngIf="!loading">
+    <mat-card *ngFor="let p of patients" class="patient-card" routerLink="/patients/{{ p.id }}">
+      <mat-card-content>
+        <div class="card-avatar">{{ p.prenom[0] }}{{ p.nom[0] }}</div>
+        <div class="card-info">
+          <h3>{{ p.prenom }} {{ p.nom }}</h3>
+          <p *ngIf="p.telephone"><mat-icon>phone</mat-icon> {{ p.telephone }}</p>
+          <p *ngIf="p.adresse"><mat-icon>location_on</mat-icon> {{ p.adresse }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="empty-state" *ngIf="patients.length === 0">
+      <mat-icon>people_outline</mat-icon>
+      <p>Aucun patient trouvé</p>
+      <button mat-raised-button color="primary" routerLink="/patients/new">
+        Ajouter un patient
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,51 @@
+<div class="auth-container">
+  <div class="auth-left">
+    <div class="brand">
+      <mat-icon class="brand-icon">healing</mat-icon>
+      <h1>ALTEA</h1>
+      <p>Plateforme d'aide aux soins à domicile</p>
+    </div>
+  </div>
+  <div class="auth-right">
+    <mat-card class="login-card">
+      <mat-card-header>
+        <mat-card-title>Connexion</mat-card-title>
+        <mat-card-subtitle>Accédez à votre espace professionnel</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="vous@exemple.be">
+            <mat-icon matSuffix>email</mat-icon>
+            <mat-error *ngIf="loginForm.get('email')?.hasError('required')">Email requis</mat-error>
+            <mat-error *ngIf="loginForm.get('email')?.hasError('email')">Email invalide</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Mot de passe</mat-label>
+            <input matInput [type]="showPwd ? 'text' : 'password'" formControlName="password">
+            <button mat-icon-button matSuffix type="button" (click)="showPwd = !showPwd">
+              <mat-icon>{{ showPwd ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Mot de passe requis</mat-error>
+          </mat-form-field>
+
+          <div class="error-message" *ngIf="errorMessage">
+            <mat-icon>error</mat-icon>
+            {{ errorMessage }}
+          </div>
+
+          <button mat-raised-button color="primary" type="submit"
+                  class="submit-btn" [disabled]="loading || loginForm.invalid">
+            <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+            <span *ngIf="!loading">Se connecter</span>
+          </button>
+        </form>
+      </mat-card-content>
+      <mat-card-actions>
+        <p>Pas encore de compte ? <a routerLink="/register">S'inscrire</a></p>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

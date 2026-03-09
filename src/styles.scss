@@ -1,0 +1,23 @@
+@use '@angular/material' as mat;
+
+// Global reset & base styles
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; font-family: 'Roboto', 'Helvetica Neue', sans-serif; }
+body { background: #F5F7FA; }
+
+// Scrollbar styling
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f0f0f0; }
+::-webkit-scrollbar-thumb { background: #1F5C8B; border-radius: 3px; }
+
+// Material overrides
+.mat-mdc-card { border-radius: 12px !important; }
+.mat-mdc-raised-button { border-radius: 8px !important; }
+
+// Page padding helper
+.page-container { padding: 24px; max-width: 1400px; }
+
+// Responsive
+@media (max-width: 768px) {
+  .page-container { padding: 16px; }
+}

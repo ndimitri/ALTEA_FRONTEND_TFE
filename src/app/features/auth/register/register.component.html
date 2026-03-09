@@ -1,0 +1,64 @@
+<div class="auth-container">
+  <div class="auth-left">
+    <div class="brand">
+      <mat-icon class="brand-icon">healing</mat-icon>
+      <h1>ALTEA</h1>
+      <p>Rejoignez la plateforme des soins à domicile</p>
+    </div>
+  </div>
+  <div class="auth-right">
+    <mat-card class="register-card">
+      <mat-card-header>
+        <mat-card-title>Créer un compte</mat-card-title>
+        <mat-card-subtitle>Inscription professionnelle</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="name-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Nom</mat-label>
+              <input matInput formControlName="nom">
+              <mat-error>Nom requis</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Prénom</mat-label>
+              <input matInput formControlName="prenom">
+              <mat-error>Prénom requis</mat-error>
+            </mat-form-field>
+          </div>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email professionnel</mat-label>
+            <input matInput type="email" formControlName="email">
+            <mat-icon matSuffix>email</mat-icon>
+            <mat-error>Email valide requis</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Téléphone</mat-label>
+            <input matInput formControlName="telephone" placeholder="+32 ...">
+            <mat-icon matSuffix>phone</mat-icon>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Mot de passe</mat-label>
+            <input matInput [type]="showPwd ? 'text' : 'password'" formControlName="password">
+            <button mat-icon-button matSuffix type="button" (click)="showPwd = !showPwd">
+              <mat-icon>{{ showPwd ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-hint>Minimum 6 caractères</mat-hint>
+            <mat-error>Mot de passe requis (min. 6 caractères)</mat-error>
+          </mat-form-field>
+          <div class="error-message" *ngIf="errorMessage">
+            <mat-icon>error</mat-icon>{{ errorMessage }}
+          </div>
+          <button mat-raised-button color="primary" type="submit"
+                  class="submit-btn" [disabled]="loading || form.invalid">
+            <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+            <span *ngIf="!loading">Créer mon compte</span>
+          </button>
+        </form>
+      </mat-card-content>
+      <mat-card-actions>
+        <p>Déjà inscrit ? <a routerLink="/login">Se connecter</a></p>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>
