@@ -20,19 +20,7 @@ import { PatientService } from '../../../core/services/api.services';
     MatButtonModule, MatIconModule, MatDividerModule, MatSnackBarModule
   ],
   templateUrl: './patient-form.component.html',
-  styles: [`
-    .page-container { padding: 24px; }
-    .page-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-    .page-header h2 { margin: 0; color: #0D3B66; }
-    .form-card { max-width: 760px; }
-    h3 { color: #1F5C8B; margin: 20px 0 12px; font-size: 15px; }
-    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .full-width { width: 100%; }
-    mat-form-field { width: 100%; margin-bottom: 8px; }
-    mat-divider { margin: 16px 0; }
-    .form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
-    @media (max-width: 600px) { .row-2 { grid-template-columns: 1fr; } }
-  `]
+  styleUrl: './patient-form.component.scss'
 })
 export class PatientFormComponent implements OnInit {
   form!: FormGroup;

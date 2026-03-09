@@ -31,35 +31,7 @@ import { CalendarEvent, Patient } from '../../core/models/models';
     MatSnackBarModule, MatChipsModule
   ],
   templateUrl: './planning.component.html',
-  styles: [`
-    .planning-container { padding: 24px; position: relative; }
-    .planning-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .planning-header h2 { margin: 0; font-size: 24px; color: #0D3B66; }
-    .subtitle { margin: 4px 0 0; color: #666; font-size: 14px; }
-    .calendar-card { padding: 16px; }
-    ::ng-deep .fc-toolbar-title { font-size: 1.2em !important; }
-    ::ng-deep .fc-button { background: #1F5C8B !important; border-color: #1F5C8B !important; }
-    ::ng-deep .fc-button:hover { background: #0D3B66 !important; }
-    ::ng-deep .fc-today-button { background: #64B5F6 !important; border-color: #64B5F6 !important; }
-    ::ng-deep .fc-event { cursor: pointer; border-radius: 4px; }
-    .rdv-panel { position: fixed; right: 24px; top: 100px; width: 300px; z-index: 100; }
-    .rdv-panel mat-icon { font-size: 16px; vertical-align: middle; margin-right: 4px; }
-    .create-dialog-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-      display: flex; align-items: center; justify-content: center; z-index: 1000;
-    }
-    .create-dialog { width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
-    .full-width { width: 100%; margin-bottom: 12px; }
-    .color-picker { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-    .colors { display: flex; gap: 8px; }
-    .color-dot {
-      width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
-      transition: transform 0.15s; border: 2px solid transparent;
-    }
-    .color-dot:hover { transform: scale(1.2); }
-    .color-dot.selected { border-color: #333; transform: scale(1.2); }
-    .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; }
-  `]
+  styleUrl: './planning.component.scss'
 })
 export class PlanningComponent implements OnInit {
   calendarOptions: CalendarOptions = {};
