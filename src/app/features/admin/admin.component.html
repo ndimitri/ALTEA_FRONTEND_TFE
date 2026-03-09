@@ -1,52 +1,59 @@
-<div class="page-container">
-  <h2>Administration</h2>
+<div class="p-4 md:p-6">
+  <h2 class="text-2xl font-semibold text-primary mb-5">Administration</h2>
 
-  <mat-card class="users-card">
-    <mat-card-header><mat-card-title>Utilisateurs ({{ users.length }})</mat-card-title></mat-card-header>
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Utilisateurs ({{ users.length }})</mat-card-title>
+    </mat-card-header>
     <mat-card-content>
-      <table mat-table [dataSource]="users" class="users-table">
-        <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>Utilisateur</th>
-          <td mat-cell *matCellDef="let u">
-            <div class="user-cell">
-              <div class="avatar-sm">{{ u.prenom[0] }}{{ u.nom[0] }}</div>
-              <div>
-                <div>{{ u.prenom }} {{ u.nom }}</div>
-                <small>{{ u.email }}</small>
+      <div class="overflow-x-auto">
+        <table mat-table [dataSource]="users" class="w-full">
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Utilisateur</th>
+            <td mat-cell *matCellDef="let u">
+              <div class="flex items-center gap-3 py-2">
+                <div
+                    class="w-9 h-9 rounded-full bg-primary-light text-white flex items-center justify-center font-bold text-sm shrink-0">
+                  {{ u.prenom[0] }}{{ u.nom[0] }}
+                </div>
+                <div>
+                  <div>{{ u.prenom }} {{ u.nom }}</div>
+                  <small class="text-gray-400">{{ u.email }}</small>
+                </div>
               </div>
-            </div>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="role">
-          <th mat-header-cell *matHeaderCellDef>Rôle</th>
-          <td mat-cell *matCellDef="let u">
-            <mat-chip [color]="u.role === 'ROLE_ADMIN' ? 'warn' : 'primary'" highlighted>
-              {{ u.role === 'ROLE_ADMIN' ? 'Admin' : 'Utilisateur' }}
-            </mat-chip>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="modules">
-          <th mat-header-cell *matHeaderCellDef>Modules</th>
-          <td mat-cell *matCellDef="let u">
-            <div class="module-toggles">
-              <button *ngFor="let m of allModules" mat-stroked-button
-                      [color]="isModuleActive(u.id, m.id) ? 'primary' : ''"
-                      (click)="toggleModule(u.id, m.id)"
-                      class="module-btn">
-                {{ getModuleShort(m.nom) }}
-              </button>
-            </div>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="actif">
-          <th mat-header-cell *matHeaderCellDef>Actif</th>
-          <td mat-cell *matCellDef="let u">
-            <mat-slide-toggle [checked]="u.actif" (change)="toggleUser(u.id)"></mat-slide-toggle>
-          </td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="displayedCols"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedCols;"></tr>
-      </table>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="role">
+            <th mat-header-cell *matHeaderCellDef>Rôle</th>
+            <td mat-cell *matCellDef="let u">
+              <mat-chip [color]="u.role === 'ROLE_ADMIN' ? 'warn' : 'primary'" highlighted>
+                {{ u.role === 'ROLE_ADMIN' ? 'Admin' : 'Utilisateur' }}
+              </mat-chip>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="modules">
+            <th mat-header-cell *matHeaderCellDef>Modules</th>
+            <td mat-cell *matCellDef="let u">
+              <div class="flex gap-1 flex-wrap">
+                <button *ngFor="let m of allModules" mat-stroked-button
+                        [color]="isModuleActive(u.id, m.id) ? 'primary' : ''"
+                        (click)="toggleModule(u.id, m.id)"
+                        class="!min-w-0 !px-2.5 !text-xs !h-7">
+                  {{ getModuleShort(m.nom) }}
+                </button>
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="actif">
+            <th mat-header-cell *matHeaderCellDef>Actif</th>
+            <td mat-cell *matCellDef="let u">
+              <mat-slide-toggle [checked]="u.actif" (change)="toggleUser(u.id)"></mat-slide-toggle>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedCols"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedCols;"></tr>
+        </table>
+      </div>
     </mat-card-content>
   </mat-card>
 </div>

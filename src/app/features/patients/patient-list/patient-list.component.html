@@ -1,8 +1,9 @@
-<div class="page-container">
-  <div class="page-header">
+<div class="p-4 md:p-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
     <div>
-      <h2>Mes Patients</h2>
-      <p class="subtitle">{{ patients.length }} patient(s)</p>
+      <h2 class="m-0 text-2xl text-primary font-semibold">Mes Patients</h2>
+      <p class="mt-1 text-sm text-gray-500">{{ patients.length }} patient(s)</p>
     </div>
     <button mat-raised-button color="primary" routerLink="/patients/new">
       <mat-icon>person_add</mat-icon>
@@ -10,40 +11,44 @@
     </button>
   </div>
 
-  <mat-form-field appearance="outline" class="search-field">
+  <mat-form-field appearance="outline" class="w-full max-w-lg block mb-5">
     <mat-label>Rechercher un patient</mat-label>
     <input matInput [(ngModel)]="searchTerm" (ngModelChange)="onSearch($event)"
            placeholder="Nom, prénom...">
     <mat-icon matSuffix>search</mat-icon>
   </mat-form-field>
 
-  <div class="loading" *ngIf="loading">
+  <div class="flex justify-center py-12" *ngIf="loading">
     <mat-spinner diameter="40"></mat-spinner>
   </div>
 
-  <div class="patients-grid" *ngIf="!loading">
-    <mat-card *ngFor="let p of patients" class="patient-card" routerLink="/patients/{{ p.id }}">
-      <mat-card-content>
-        <div class="card-avatar">{{ p.prenom[0] }}{{ p.nom[0] }}</div>
-        <div class="card-info">
-          <h3>{{ p.prenom }} {{ p.nom }}</h3>
-          <p *ngIf="p.telephone">
-            <mat-icon>phone</mat-icon>
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4" *ngIf="!loading">
+    <mat-card *ngFor="let p of patients"
+              class="cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg"
+              routerLink="/patients/{{ p.id }}">
+      <mat-card-content class="!flex items-center gap-4 !p-4">
+        <div
+            class="w-12 h-12 rounded-full bg-primary-light text-white flex items-center justify-center font-bold text-lg shrink-0">
+          {{ p.prenom[0] }}{{ p.nom[0] }}
+        </div>
+        <div>
+          <h3 class="m-0 mb-1 text-base font-medium">{{ p.prenom }} {{ p.nom }}</h3>
+          <p class="m-0 mt-0.5 text-xs text-gray-500 flex items-center gap-1" *ngIf="p.telephone">
+            <mat-icon class="!text-sm !w-3.5 !h-3.5">phone</mat-icon>
             {{ p.telephone }}
           </p>
-          <p *ngIf="p.address">
-            <mat-icon>location_on</mat-icon>
+          <p class="m-0 mt-0.5 text-xs text-gray-500 flex items-center gap-1" *ngIf="p.address">
+            <mat-icon class="!text-sm !w-3.5 !h-3.5">location_on</mat-icon>
             {{ p.address }}
           </p>
         </div>
       </mat-card-content>
     </mat-card>
 
-    <div class="empty-state" *ngIf="patients.length === 0">
-      <mat-icon>people_outline</mat-icon>
+    <div class="col-span-full text-center py-16 text-gray-400" *ngIf="patients.length === 0">
+      <mat-icon class="!text-[64px] !w-16 !h-16">people_outline</mat-icon>
       <p>Aucun patient trouvé</p>
-      <button mat-raised-button color="primary" routerLink="/patients/new">
-        Ajouter un patient
+      <button mat-raised-button color="primary" routerLink="/patients/new">Ajouter un patient
       </button>
     </div>
   </div>

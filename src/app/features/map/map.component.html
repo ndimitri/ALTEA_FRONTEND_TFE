@@ -1,16 +1,16 @@
-<div class="map-container">
-  <div class="map-sidebar">
-    <mat-card class="sidebar-card">
+<div class="flex h-screen">
+  <!-- Sidebar -->
+  <div class="w-[340px] shrink-0 overflow-y-auto bg-surface p-4">
+    <mat-card>
       <mat-card-header>
-        <mat-card-title>
+        <mat-card-title class="flex items-center gap-2 text-lg">
           <mat-icon>map</mat-icon>
           Carte & Tournées
         </mat-card-title>
         <mat-card-subtitle>{{ patients.length }} patients géolocalisés</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-
-        <div class="action-buttons">
+        <div class="flex gap-2 mb-3 flex-wrap">
           <button mat-raised-button color="primary" (click)="calculateRoute()"
                   [disabled]="selectedPatients.length < 2 || loadingRoute">
             <mat-spinner diameter="16" *ngIf="loadingRoute"></mat-spinner>
@@ -23,8 +23,7 @@
           </button>
         </div>
 
-        <!-- Infos route -->
-        <div class="route-info" *ngIf="routeInfo">
+        <div class="mb-3" *ngIf="routeInfo">
           <mat-chip-set>
             <mat-chip>
               <mat-icon>straighten</mat-icon>
@@ -37,24 +36,28 @@
           </mat-chip-set>
         </div>
 
-        <p class="hint" *ngIf="selectedPatients.length < 2">
-          <mat-icon>info</mat-icon>
+        <p class="text-xs text-gray-400 flex items-center gap-1 mb-3"
+           *ngIf="selectedPatients.length < 2">
+          <mat-icon class="!text-base">info</mat-icon>
           Sélectionnez au moins 2 patients pour calculer l'itinéraire
         </p>
 
-        <h4>Patients ({{ patients.length }})</h4>
+        <h4 class="mt-4 mb-2 text-primary font-semibold text-sm">Patients ({{ patients.length }}
+          )</h4>
         <mat-selection-list [(ngModel)]="selectedPatients" (ngModelChange)="onSelectionChange()"
                             [ngModelOptions]="{standalone: true}">
           <mat-list-option *ngFor="let p of patients; let i = index" [value]="p">
-            <div class="patient-item">
-              <div class="patient-num">{{ i + 1 }}</div>
+            <div class="flex items-center gap-3">
+              <div
+                  class="w-[26px] h-[26px] rounded-full bg-primary-light text-white flex items-center justify-center text-xs font-bold shrink-0">
+                {{ i + 1 }}
+              </div>
               <div>
-                <div class="patient-name">{{ p.prenom }} {{ p.nom }}</div>
-                <div class="patient-addr"
+                <div class="font-medium text-sm">{{ p.prenom }} {{ p.nom }}</div>
+                <div class="text-xs text-gray-400"
                      *ngIf="p.address">{{ p.address.house_number }} {{ p.address.road }}
                   , {{ p.address.postcode }} {{
-                    p.address.town ? p.address.town
-                        : p.address.county
+                    p.address.town ? p.address.town : p.address.county
                   }}
                 </div>
               </div>
@@ -62,17 +65,19 @@
           </mat-list-option>
         </mat-selection-list>
 
-        <div class="no-patients" *ngIf="patients.length === 0">
-          <mat-icon>person_pin</mat-icon>
+        <div class="text-center py-6 text-gray-400" *ngIf="patients.length === 0">
+          <mat-icon class="!text-[48px] !w-12 !h-12">person_pin</mat-icon>
           <p>Aucun patient géolocalisé.<br>Ajoutez des coordonnées dans les fiches patients.</p>
         </div>
       </mat-card-content>
     </mat-card>
   </div>
 
-  <div class="map-main">
-    <div id="altea-map" class="leaflet-map"></div>
-    <div class="map-loading" *ngIf="loadingPatients">
+  <!-- Map -->
+  <div class="flex-1 relative">
+    <div id="altea-map" class="w-full h-full"></div>
+    <div class="absolute inset-0 flex items-center justify-center bg-white/70 z-[1000]"
+         *ngIf="loadingPatients">
       <mat-spinner diameter="40"></mat-spinner>
     </div>
   </div>

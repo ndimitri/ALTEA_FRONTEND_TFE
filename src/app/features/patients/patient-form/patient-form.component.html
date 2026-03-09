@@ -1,128 +1,117 @@
-<div class="page-container">
-  <div class="page-header">
+<div class="p-4 md:p-6">
+  <div class="flex items-center gap-3 mb-5">
     <button mat-icon-button routerLink="/patients">
       <mat-icon>arrow_back</mat-icon>
     </button>
-    <h2>{{ isEdit ? 'Modifier le patient' : 'Nouveau patient' }}</h2>
+    <h2 class="m-0 text-primary text-xl font-semibold">{{
+        isEdit ? 'Modifier le patient' : 'Nouveau patient'
+      }}</h2>
   </div>
 
-  <mat-card class="form-card">
+  <mat-card class="max-w-3xl">
     <mat-card-content>
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
-        <h3>Identité</h3>
-        <div class="row-2">
-          <mat-form-field appearance="outline">
+        <h3 class="text-primary-light text-sm font-semibold mt-5 mb-3">Identité</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Nom *</mat-label>
             <input matInput formControlName="nom">
             <mat-error>Requis</mat-error>
           </mat-form-field>
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Prénom *</mat-label>
             <input matInput formControlName="prenom">
             <mat-error>Requis</mat-error>
           </mat-form-field>
         </div>
 
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" class="w-full">
           <mat-label>Date de naissance</mat-label>
           <input matInput type="date" formControlName="dateNaissance">
         </mat-form-field>
 
-        <mat-divider></mat-divider>
-        <h3>Coordonnées</h3>
+        <mat-divider class="my-4"></mat-divider>
+        <h3 class="text-primary-light text-sm font-semibold mt-5 mb-3">Coordonnées</h3>
 
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" class="w-full">
           <mat-label>Adresse</mat-label>
-          <!--          <input matInput formControlName="adresse" placeholder="Rue, numéro, code postal, ville">-->
-          <input
-              matInput
-              formControlName="addressInput"
-              [matAutocomplete]="auto"
-              placeholder="Rue numéro, code postal ville">
-
-          <mat-autocomplete
-              #auto="matAutocomplete"
-              (optionSelected)="selectAddress($event.option.value)">
-
-            <mat-option
-                *ngFor="let a of addressSuggestions"
-                [value]="a">
-
-              {{ a.address.road }} {{ a.address.house_number }}
-              , {{ a.address.postcode }} {{
+          <input matInput formControlName="addressInput" [matAutocomplete]="auto"
+                 placeholder="Rue numéro, code postal ville">
+          <mat-autocomplete #auto="matAutocomplete"
+                            (optionSelected)="selectAddress($event.option.value)">
+            <mat-option *ngFor="let a of addressSuggestions" [value]="a">
+              {{ a.address.road }} {{ a.address.house_number }}, {{ a.address.postcode }} {{
                 a.address.town ? a.address.town : a.address.county
               }} {{ a.address.country }}
-
             </mat-option>
-
           </mat-autocomplete>
           <mat-icon matSuffix>location_on</mat-icon>
         </mat-form-field>
 
-        <div class="row-2">
-          <mat-form-field appearance="outline">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Latitude (GPS)</mat-label>
             <input matInput type="number" formControlName="latitude" step="0.000001"
                    placeholder="ex: 50.85045" [disabled]=true>
             <mat-hint>Pour la carte Leaflet</mat-hint>
           </mat-form-field>
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Longitude (GPS)</mat-label>
             <input matInput type="number" formControlName="longitude" step="0.000001"
                    placeholder="ex: 4.34878">
           </mat-form-field>
         </div>
 
-        <div class="row-2">
-          <mat-form-field appearance="outline">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Téléphone</mat-label>
             <input matInput formControlName="telephone" placeholder="+32 ...">
             <mat-icon matSuffix>phone</mat-icon>
           </mat-form-field>
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Email</mat-label>
             <input matInput type="email" formControlName="email">
             <mat-icon matSuffix>email</mat-icon>
           </mat-form-field>
         </div>
 
-        <mat-divider></mat-divider>
-        <h3>Informations médicales</h3>
+        <mat-divider class="my-4"></mat-divider>
+        <h3 class="text-primary-light text-sm font-semibold mt-5 mb-3">Informations médicales</h3>
 
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" class="w-full">
           <mat-label>Antécédents / Informations médicales</mat-label>
           <textarea matInput formControlName="informationsMedicales" rows="3"
                     placeholder="Allergies, pathologies, traitements en cours..."></textarea>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" class="w-full">
           <mat-label>Médecin référent</mat-label>
           <input matInput formControlName="medecinReferent">
           <mat-icon matSuffix>local_hospital</mat-icon>
         </mat-form-field>
 
-        <mat-divider></mat-divider>
-        <h3>Mutuelle</h3>
+        <mat-divider class="my-4"></mat-divider>
+        <h3 class="text-primary-light text-sm font-semibold mt-5 mb-3">Mutuelle</h3>
 
-        <div class="row-2">
-          <mat-form-field appearance="outline">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Nom de la mutuelle</mat-label>
             <input matInput formControlName="nomMutuelle" placeholder="Ex: Mutualité chrétienne">
           </mat-form-field>
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>N° affilié</mat-label>
             <input matInput formControlName="numeroMutuelle">
           </mat-form-field>
         </div>
 
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" class="w-full">
           <mat-label>Notes</mat-label>
           <textarea matInput formControlName="notes" rows="3"
                     placeholder="Remarques diverses..."></textarea>
         </mat-form-field>
 
-        <div class="form-actions">
+        <div class="flex justify-end gap-3 mt-6">
           <button mat-button type="button" routerLink="/patients">Annuler</button>
           <button mat-raised-button color="primary" type="submit"
                   [disabled]="form.invalid || saving">

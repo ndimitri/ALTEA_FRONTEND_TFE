@@ -1,51 +1,58 @@
-<div class="planning-container">
-  <div class="planning-header">
+<div class="p-4 md:p-6 relative">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
     <div>
-      <h2>Mon Planning</h2>
-      <p class="subtitle">Gérez vos rendez-vous et tournées</p>
+      <h2 class="m-0 text-2xl text-primary font-semibold">Mon Planning</h2>
+      <p class="mt-1 text-sm text-gray-500">Gérez vos rendez-vous et tournées</p>
     </div>
     <button mat-raised-button color="primary" (click)="openCreateDialog()">
-      <mat-icon>add</mat-icon> Nouveau rendez-vous
+      <mat-icon>add</mat-icon>
+      Nouveau rendez-vous
     </button>
   </div>
 
-  <mat-card class="calendar-card">
+  <mat-card class="p-4">
     <full-calendar [options]="calendarOptions"></full-calendar>
   </mat-card>
 
   <!-- Panneau détail RDV -->
-  <div class="rdv-panel" *ngIf="selectedEvent">
+  <div class="fixed right-6 top-24 w-[300px] z-[100]" *ngIf="selectedEvent">
     <mat-card>
       <mat-card-header>
         <mat-card-title>{{ selectedEvent.title }}</mat-card-title>
         <mat-card-subtitle>{{ selectedEvent.extendedProps.statut }}</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <p *ngIf="selectedEvent.extendedProps.lieu">
-          <mat-icon>location_on</mat-icon> {{ selectedEvent.extendedProps.lieu }}
+        <p *ngIf="selectedEvent.extendedProps.lieu" class="flex items-center gap-1">
+          <mat-icon class="!text-base">location_on</mat-icon>
+          {{ selectedEvent.extendedProps.lieu }}
         </p>
-        <p *ngIf="selectedEvent.extendedProps.commentaire">
-          <mat-icon>notes</mat-icon> {{ selectedEvent.extendedProps.commentaire }}
+        <p *ngIf="selectedEvent.extendedProps.commentaire" class="flex items-center gap-1">
+          <mat-icon class="!text-base">notes</mat-icon>
+          {{ selectedEvent.extendedProps.commentaire }}
         </p>
       </mat-card-content>
       <mat-card-actions>
         <button mat-button color="warn" (click)="deleteRdv(selectedEvent!.id)">
-          <mat-icon>delete</mat-icon> Supprimer
+          <mat-icon>delete</mat-icon>
+          Supprimer
         </button>
         <button mat-button (click)="selectedEvent = null">Fermer</button>
       </mat-card-actions>
     </mat-card>
   </div>
 
-  <!-- Dialog création RDV (inline) -->
-  <div class="create-dialog-overlay" *ngIf="showCreateDialog" (click)="closeDialog()">
-    <mat-card class="create-dialog" (click)="$event.stopPropagation()">
+  <!-- Dialog création RDV -->
+  <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]"
+       *ngIf="showCreateDialog" (click)="closeDialog()">
+    <mat-card class="w-[480px] max-w-[95vw] max-h-[90vh] overflow-y-auto"
+              (click)="$event.stopPropagation()">
       <mat-card-header>
         <mat-card-title>Nouveau rendez-vous</mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <form [formGroup]="rdvForm" (ngSubmit)="submitRdv()">
-          <mat-form-field appearance="outline" class="full-width">
+          <mat-form-field appearance="outline" class="w-full mb-3">
             <mat-label>Patient</mat-label>
             <mat-select formControlName="patientId">
               <mat-option *ngFor="let p of patients" [value]="p.id">
@@ -53,39 +60,38 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
+          <mat-form-field appearance="outline" class="w-full mb-3">
             <mat-label>Début</mat-label>
             <input matInput type="datetime-local" formControlName="dateHeureDebut">
           </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
+          <mat-form-field appearance="outline" class="w-full mb-3">
             <mat-label>Fin</mat-label>
             <input matInput type="datetime-local" formControlName="dateHeureFin">
           </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
+          <mat-form-field appearance="outline" class="w-full mb-3">
             <mat-label>Lieu (optionnel)</mat-label>
             <input matInput formControlName="lieu" placeholder="Adresse du patient...">
             <mat-icon matSuffix>location_on</mat-icon>
           </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
+          <mat-form-field appearance="outline" class="w-full mb-3">
             <mat-label>Commentaire</mat-label>
             <textarea matInput formControlName="commentaire" rows="2"></textarea>
           </mat-form-field>
 
-          <div class="color-picker">
-            <label>Couleur :</label>
-            <div class="colors">
-              <div *ngFor="let c of colors" class="color-dot"
+          <div class="flex items-center gap-3 mb-4">
+            <label class="text-sm text-gray-600">Couleur :</label>
+            <div class="flex gap-2">
+              <div *ngFor="let c of colors"
+                   class="w-7 h-7 rounded-full cursor-pointer transition-transform hover:scale-110 border-2"
                    [style.background]="c"
-                   [class.selected]="rdvForm.get('couleur')?.value === c"
+                   [class.border-gray-800]="rdvForm.get('couleur')?.value === c"
+                   [class.border-transparent]="rdvForm.get('couleur')?.value !== c"
+                   [class.scale-110]="rdvForm.get('couleur')?.value === c"
                    (click)="rdvForm.patchValue({couleur: c})"></div>
             </div>
           </div>
 
-          <div class="dialog-actions">
+          <div class="flex justify-end gap-2">
             <button mat-button type="button" (click)="closeDialog()">Annuler</button>
             <button mat-raised-button color="primary" type="submit" [disabled]="rdvForm.invalid">
               Enregistrer
