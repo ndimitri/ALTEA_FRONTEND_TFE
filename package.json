@@ -7,6 +7,7 @@
     "start": "ng serve",
     "build": "ng build",
     "build:prod": "ng build --configuration production",
+    "serve:pwa": "ng build --configuration production && npx serve dist/altea-frontend/browser --single --listen 4500",
     "test": "ng test",
     "lint": "ng lint"
   },
