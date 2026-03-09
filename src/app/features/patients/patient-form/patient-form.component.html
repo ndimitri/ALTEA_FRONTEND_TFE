@@ -1,6 +1,8 @@
 <div class="page-container">
   <div class="page-header">
-    <button mat-icon-button routerLink="/patients"><mat-icon>arrow_back</mat-icon></button>
+    <button mat-icon-button routerLink="/patients">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
     <h2>{{ isEdit ? 'Modifier le patient' : 'Nouveau patient' }}</h2>
   </div>
 
@@ -32,19 +34,43 @@
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Adresse</mat-label>
-          <input matInput formControlName="adresse" placeholder="Rue, numéro, code postal, ville">
+          <!--          <input matInput formControlName="adresse" placeholder="Rue, numéro, code postal, ville">-->
+          <input
+              matInput
+              formControlName="addressInput"
+              [matAutocomplete]="auto"
+              placeholder="Rue numéro, code postal ville">
+
+          <mat-autocomplete
+              #auto="matAutocomplete"
+              (optionSelected)="selectAddress($event.option.value)">
+
+            <mat-option
+                *ngFor="let a of addressSuggestions"
+                [value]="a">
+
+              {{ a.address.road }} {{ a.address.house_number }}
+              , {{ a.address.postcode }} {{
+                a.address.town ? a.address.town : a.address.county
+              }} {{ a.address.country }}
+
+            </mat-option>
+
+          </mat-autocomplete>
           <mat-icon matSuffix>location_on</mat-icon>
         </mat-form-field>
 
         <div class="row-2">
           <mat-form-field appearance="outline">
             <mat-label>Latitude (GPS)</mat-label>
-            <input matInput type="number" formControlName="latitude" step="0.000001" placeholder="ex: 50.85045">
+            <input matInput type="number" formControlName="latitude" step="0.000001"
+                   placeholder="ex: 50.85045" [disabled]=true>
             <mat-hint>Pour la carte Leaflet</mat-hint>
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Longitude (GPS)</mat-label>
-            <input matInput type="number" formControlName="longitude" step="0.000001" placeholder="ex: 4.34878">
+            <input matInput type="number" formControlName="longitude" step="0.000001"
+                   placeholder="ex: 4.34878">
           </mat-form-field>
         </div>
 
@@ -92,12 +118,14 @@
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Notes</mat-label>
-          <textarea matInput formControlName="notes" rows="3" placeholder="Remarques diverses..."></textarea>
+          <textarea matInput formControlName="notes" rows="3"
+                    placeholder="Remarques diverses..."></textarea>
         </mat-form-field>
 
         <div class="form-actions">
           <button mat-button type="button" routerLink="/patients">Annuler</button>
-          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || saving">
+          <button mat-raised-button color="primary" type="submit"
+                  [disabled]="form.invalid || saving">
             {{ isEdit ? 'Mettre à jour' : 'Créer le patient' }}
           </button>
         </div>

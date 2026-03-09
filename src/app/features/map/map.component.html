@@ -3,28 +3,37 @@
     <mat-card class="sidebar-card">
       <mat-card-header>
         <mat-card-title>
-          <mat-icon>map</mat-icon> Carte & Tournées
+          <mat-icon>map</mat-icon>
+          Carte & Tournées
         </mat-card-title>
         <mat-card-subtitle>{{ patients.length }} patients géolocalisés</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
 
         <div class="action-buttons">
-          <button mat-raised-button color="primary" (click)="calculateRoute()" [disabled]="selectedPatients.length < 2 || loadingRoute">
+          <button mat-raised-button color="primary" (click)="calculateRoute()"
+                  [disabled]="selectedPatients.length < 2 || loadingRoute">
             <mat-spinner diameter="16" *ngIf="loadingRoute"></mat-spinner>
             <mat-icon *ngIf="!loadingRoute">directions</mat-icon>
             Calculer l'itinéraire
           </button>
           <button mat-button (click)="clearRoute()" *ngIf="routeInfo">
-            <mat-icon>clear</mat-icon> Effacer
+            <mat-icon>clear</mat-icon>
+            Effacer
           </button>
         </div>
 
         <!-- Infos route -->
         <div class="route-info" *ngIf="routeInfo">
           <mat-chip-set>
-            <mat-chip><mat-icon>straighten</mat-icon> {{ routeInfo.distance }} km</mat-chip>
-            <mat-chip><mat-icon>schedule</mat-icon> {{ routeInfo.duration }} min</mat-chip>
+            <mat-chip>
+              <mat-icon>straighten</mat-icon>
+              {{ routeInfo.distance }} km
+            </mat-chip>
+            <mat-chip>
+              <mat-icon>schedule</mat-icon>
+              {{ routeInfo.duration }} min
+            </mat-chip>
           </mat-chip-set>
         </div>
 
@@ -41,7 +50,13 @@
               <div class="patient-num">{{ i + 1 }}</div>
               <div>
                 <div class="patient-name">{{ p.prenom }} {{ p.nom }}</div>
-                <div class="patient-addr" *ngIf="p.adresse">{{ p.adresse }}</div>
+                <div class="patient-addr"
+                     *ngIf="p.address">{{ p.address.house_number }} {{ p.address.road }}
+                  , {{ p.address.postcode }} {{
+                    p.address.town ? p.address.town
+                        : p.address.county
+                  }}
+                </div>
               </div>
             </div>
           </mat-list-option>

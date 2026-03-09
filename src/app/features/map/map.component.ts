@@ -1,14 +1,14 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatChipsModule } from '@angular/material/chips';
-import { PatientService, RouteService } from '../../core/services/api.services';
-import { Patient } from '../../core/models/models';
+import {Component, OnInit, OnDestroy, AfterViewInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {MatCardModule} from '@angular/material/card';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import {MatListModule} from '@angular/material/list';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
+import {MatChipsModule} from '@angular/material/chips';
+import {PatientService, RouteService} from '../../core/services/api.services';
+import {Patient} from '../../core/models/models';
 import * as L from 'leaflet';
 import {FormsModule} from "@angular/forms";
 
@@ -54,12 +54,14 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   loadingRoute = false;
 
   constructor(
-    private patientService: PatientService,
-    private routeService: RouteService,
-    private snackBar: MatSnackBar
-  ) {}
+      private patientService: PatientService,
+      private routeService: RouteService,
+      private snackBar: MatSnackBar
+  ) {
+  }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
 
   ngAfterViewInit(): void {
     this.initMap();
@@ -71,7 +73,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   initMap(): void {
-    this.map = L.map('altea-map', { zoomControl: true }).setView([50.85, 4.35], 10);
+    this.map = L.map('altea-map', {zoomControl: true}).setView([50.85, 4.35], 10);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -86,7 +88,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loadingPatients = false;
         this.addPatientMarkers();
       },
-      error: () => { this.loadingPatients = false; }
+      error: () => {
+        this.loadingPatients = false;
+      }
     });
   }
 
@@ -99,15 +103,18 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.patients.forEach((p, i) => {
       if (p.latitude && p.longitude) {
-        const marker = L.marker([p.latitude, p.longitude], { icon: patientIcon(i + 1) })
-          .addTo(this.map)
-          .bindPopup(`
+        const marker = L.marker([p.latitude, p.longitude], {icon: patientIcon(i + 1)})
+            .addTo(this.map)
+            .bindPopup(`
             <div style="min-width:160px">
               <strong>${p.prenom} ${p.nom}</strong><br>
-              ${p.adresse ? `<small>${p.adresse}</small><br>` : ''}
+              ${p.address ? `<small> ${p.address.road} ${p.address.house_number}
+                  , ${p.address.postcode}</small><br>` : ''}
               ${p.telephone ? `📞 ${p.telephone}` : ''}
             </div>
           `);
+
+        console.log("adresse : ", p.address)
 
         marker.on('click', () => {
           if (!this.selectedPatients.includes(p)) {
@@ -121,7 +128,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     if (bounds.length > 0) {
-      this.map.fitBounds(L.latLngBounds(bounds), { padding: [40, 40] });
+      this.map.fitBounds(L.latLngBounds(bounds), {padding: [40, 40]});
     }
   }
 
@@ -147,43 +154,65 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.selectedPatients.length < 2) return;
 
     const waypoints: [number, number][] = this.selectedPatients
-      .filter(p => p.latitude && p.longitude)
-      .map(p => [p.longitude!, p.latitude!]); // ORS: [lng, lat]
+        .filter(p => p.latitude && p.longitude)
+        .map(p => [p.longitude!, p.latitude!]); // ORS: [lng, lat]
 
     if (waypoints.length < 2) {
-      this.snackBar.open('Pas assez de patients géolocalisés', 'OK', { duration: 3000 });
+      this.snackBar.open('Pas assez de patients géolocalisés', 'OK', {duration: 3000});
       return;
     }
 
     this.loadingRoute = true;
     this.routeService.getRoute(waypoints).subscribe({
       next: (response) => {
-        const result = this.routeService.parseRouteResponse(response);
+        console.log("ORS response:", response);
+
+        let result;
+        try {
+          result = this.routeService.parseRouteResponse(response);
+        } catch (e) {
+          this.loadingRoute = false;
+          this.snackBar.open("Impossible de calculer l'itinéraire", "OK", {duration: 4000});
+          return;
+        }
 
         if (this.routeLayer) this.routeLayer.remove();
 
-        // ORS geometry: [lng, lat] -> Leaflet: [lat, lng]
-        const latlngs = result.geometry.map(([lng, lat]) => L.latLng(lat, lng));
+        // ORS GeoJSON geometry: coordonnées en [lng, lat] → Leaflet: [lat, lng]
+        const latlngs = result.geometry.map(([lng, lat]: [number, number]) => L.latLng(lat, lng));
+
         this.routeLayer = L.polyline(latlngs, {
-          color: '#FF6B35', weight: 5, opacity: 0.8, dashArray: '10, 5'
+          color: '#FF6B35',
+          weight: 5,
+          opacity: 0.8,
+          dashArray: '10, 5'
         }).addTo(this.map);
 
-        this.map.fitBounds(this.routeLayer.getBounds(), { padding: [30, 30] });
-        this.routeInfo = { distance: result.distance, duration: result.duration };
+        this.map.fitBounds(this.routeLayer.getBounds(), {padding: [30, 30]});
+
+        this.routeInfo = {
+          distance: result.distance,
+          duration: result.duration
+        };
+
         this.loadingRoute = false;
       },
-      error: () => {
+      error: (err) => {
+        console.error("Erreur ORS:", err);
         this.loadingRoute = false;
         this.snackBar.open(
-          'Erreur calcul d\'itinéraire. Vérifiez votre clé API OpenRouteService.',
-          'OK', { duration: 5000 }
+            "Erreur calcul d'itinéraire. Vérifiez votre clé API OpenRouteService.",
+            'OK', {duration: 5000}
         );
       }
     });
   }
 
   clearRoute(): void {
-    if (this.routeLayer) { this.routeLayer.remove(); this.routeLayer = undefined; }
+    if (this.routeLayer) {
+      this.routeLayer.remove();
+      this.routeLayer = undefined;
+    }
     this.routeInfo = null;
     this.selectedPatients = [];
     this.addPatientMarkers();

@@ -1,19 +1,24 @@
 <div class="page-container" *ngIf="patient">
   <div class="page-header">
-    <button mat-icon-button routerLink="/patients"><mat-icon>arrow_back</mat-icon></button>
+    <button mat-icon-button routerLink="/patients">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
     <div class="patient-title">
       <div class="avatar">{{ patient.prenom[0] }}{{ patient.nom[0] }}</div>
       <div>
         <h2>{{ patient.prenom }} {{ patient.nom }}</h2>
-        <p *ngIf="patient.dateNaissance">Né(e) le {{ patient.dateNaissance | date:'dd/MM/yyyy' }}</p>
+        <p *ngIf="patient.dateNaissance">Né(e)
+          le {{ patient.dateNaissance | date:'dd/MM/yyyy' }}</p>
       </div>
     </div>
     <div class="header-actions">
       <button mat-button color="primary" routerLink="/patients/{{ patient.id }}/edit">
-        <mat-icon>edit</mat-icon> Modifier
+        <mat-icon>edit</mat-icon>
+        Modifier
       </button>
       <button mat-button color="warn" (click)="deletePatient()">
-        <mat-icon>delete</mat-icon> Supprimer
+        <mat-icon>delete</mat-icon>
+        Supprimer
       </button>
     </div>
   </div>
@@ -24,16 +29,25 @@
       <div class="tab-content">
         <div class="info-grid">
           <mat-card>
-            <mat-card-header><mat-card-title>Coordonnées</mat-card-title></mat-card-header>
+            <mat-card-header>
+              <mat-card-title>Coordonnées</mat-card-title>
+            </mat-card-header>
             <mat-card-content>
-              <div class="info-row" *ngIf="patient.adresse">
-                <mat-icon>location_on</mat-icon><span>{{ patient.adresse }}</span>
+              <div class="info-row" *ngIf="patient.address">
+                <mat-icon>location_on</mat-icon>
+                <span>{{ patient.address.house_number }} {{ patient.address.road }}
+                  , {{ patient.address.postcode }} {{
+                    patient.address.town ? patient.address.town
+                        : patient.address.county
+                  }}</span>
               </div>
               <div class="info-row" *ngIf="patient.telephone">
-                <mat-icon>phone</mat-icon><span>{{ patient.telephone }}</span>
+                <mat-icon>phone</mat-icon>
+                <span>{{ patient.telephone }}</span>
               </div>
               <div class="info-row" *ngIf="patient.email">
-                <mat-icon>email</mat-icon><span>{{ patient.email }}</span>
+                <mat-icon>email</mat-icon>
+                <span>{{ patient.email }}</span>
               </div>
               <div class="info-row" *ngIf="patient.latitude">
                 <mat-icon>my_location</mat-icon>
@@ -42,18 +56,26 @@
             </mat-card-content>
           </mat-card>
           <mat-card>
-            <mat-card-header><mat-card-title>Médical</mat-card-title></mat-card-header>
+            <mat-card-header>
+              <mat-card-title>Médical</mat-card-title>
+            </mat-card-header>
             <mat-card-content>
-              <p *ngIf="patient.medecinReferent"><strong>Médecin :</strong> {{ patient.medecinReferent }}</p>
-              <p *ngIf="patient.nomMutuelle"><strong>Mutuelle :</strong> {{ patient.nomMutuelle }}</p>
-              <p *ngIf="patient.numeroMutuelle"><strong>N° affilié :</strong> {{ patient.numeroMutuelle }}</p>
+              <p *ngIf="patient.medecinReferent"><strong>Médecin
+                :</strong> {{ patient.medecinReferent }}</p>
+              <p *ngIf="patient.nomMutuelle"><strong>Mutuelle :</strong> {{ patient.nomMutuelle }}
+              </p>
+              <p *ngIf="patient.numeroMutuelle"><strong>N° affilié
+                :</strong> {{ patient.numeroMutuelle }}</p>
               <mat-divider *ngIf="patient.informationsMedicales"></mat-divider>
-              <p *ngIf="patient.informationsMedicales" class="medical-info">{{ patient.informationsMedicales }}</p>
+              <p *ngIf="patient.informationsMedicales"
+                 class="medical-info">{{ patient.informationsMedicales }}</p>
             </mat-card-content>
           </mat-card>
         </div>
         <mat-card *ngIf="patient.notes" class="notes-card">
-          <mat-card-header><mat-card-title>Notes</mat-card-title></mat-card-header>
+          <mat-card-header>
+            <mat-card-title>Notes</mat-card-title>
+          </mat-card-header>
           <mat-card-content><p>{{ patient.notes }}</p></mat-card-content>
         </mat-card>
       </div>
@@ -64,13 +86,16 @@
       <div class="tab-content">
         <div class="tab-actions">
           <button mat-raised-button color="primary" (click)="showSoinForm = !showSoinForm">
-            <mat-icon>add</mat-icon> Nouveau soin
+            <mat-icon>add</mat-icon>
+            Nouveau soin
           </button>
         </div>
 
         <!-- Formulaire ajout soin -->
         <mat-card *ngIf="showSoinForm" class="soin-form-card">
-          <mat-card-header><mat-card-title>Enregistrer un soin</mat-card-title></mat-card-header>
+          <mat-card-header>
+            <mat-card-title>Enregistrer un soin</mat-card-title>
+          </mat-card-header>
           <mat-card-content>
             <form [formGroup]="soinForm" (ngSubmit)="saveSoin()">
               <div class="row-2">
@@ -93,7 +118,9 @@
               </mat-form-field>
               <div class="form-actions">
                 <button mat-button type="button" (click)="showSoinForm = false">Annuler</button>
-                <button mat-raised-button color="primary" type="submit" [disabled]="soinForm.invalid">Enregistrer</button>
+                <button mat-raised-button color="primary" type="submit"
+                        [disabled]="soinForm.invalid">Enregistrer
+                </button>
               </div>
             </form>
           </mat-card-content>
@@ -110,7 +137,10 @@
               </button>
             </div>
             <p *ngIf="s.description" class="soin-desc">{{ s.description }}</p>
-            <p *ngIf="s.notes" class="soin-notes"><mat-icon>notes</mat-icon>{{ s.notes }}</p>
+            <p *ngIf="s.notes" class="soin-notes">
+              <mat-icon>notes</mat-icon>
+              {{ s.notes }}
+            </p>
           </mat-card>
         </div>
         <div class="empty-state" *ngIf="soins.length === 0 && !showSoinForm">

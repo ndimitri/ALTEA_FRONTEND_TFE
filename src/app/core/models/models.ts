@@ -25,7 +25,7 @@ export interface Patient {
   nom: string;
   prenom: string;
   dateNaissance?: string;
-  adresse?: string;
+  address?: Address;
   latitude?: number;
   longitude?: number;
   telephone?: string;
@@ -36,6 +36,25 @@ export interface Patient {
   nomMutuelle?: string;
   medecinReferent?: string;
   createdAt?: string;
+}
+
+
+export interface Address {
+  house_number?: string;
+  road?: string;
+  town?: string;
+  county?: string;
+  region?: string;
+  postcode?: string;
+  country?: string;
+  country_code?: string;
+}
+
+export interface AddressSuggestion {
+  display_name: string;
+  lat: string;
+  lon: string;
+  address: Address
 }
 
 export interface RendezVous {
