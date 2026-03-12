@@ -1,0 +1,124 @@
+<div class="p-4 md:p-6">
+  <!-- Header -->
+  <div class="mb-6">
+    <h2 class="text-2xl font-semibold text-primary m-0">Mes modules métier</h2>
+    <p class="mt-1 text-sm text-gray-500">
+      Activez les modules correspondant à votre métier pour débloquer les templates de soins
+      associés.
+    </p>
+  </div>
+
+  <!-- Skeleton -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4" *ngIf="loading">
+    <mat-card *ngFor="let i of [1,2,3,4]" class="p-5">
+      <div class="flex items-start gap-4">
+        <app-skeleton height="48px" width="48px" className="rounded-xl shrink-0"></app-skeleton>
+        <div class="flex-1">
+          <app-skeleton height="18px" width="60%" className="mb-2"></app-skeleton>
+          <app-skeleton height="13px" className="mb-1"></app-skeleton>
+          <app-skeleton height="13px" width="75%"></app-skeleton>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Modules -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4" *ngIf="!loading">
+    <mat-card *ngFor="let m of modules"
+              class="border-2 transition-all duration-200"
+              [class.border-primary]="m.activeForUser"
+              [class.border-transparent]="!m.activeForUser">
+
+      <mat-card-content class="!p-5">
+        <div class="flex items-start gap-4">
+          <!-- Icône -->
+          <div
+              class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors"
+              [class.bg-primary]="m.activeForUser"
+              [class.bg-gray-100]="!m.activeForUser">
+            <mat-icon [class.text-white]="m.activeForUser"
+                      [class.text-gray-400]="!m.activeForUser"
+                      class="!text-2xl">
+              {{ getConfig(m.nom).icon }}
+            </mat-icon>
+          </div>
+
+          <!-- Infos -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <h3 class="m-0 text-base font-semibold"
+                  [class.text-primary]="m.activeForUser"
+                  [class.text-gray-700]="!m.activeForUser">
+                {{ getConfig(m.nom).label }}
+              </h3>
+              <mat-chip *ngIf="m.activeForUser" class="!text-xs" color="primary" highlighted>
+                Actif
+              </mat-chip>
+            </div>
+            <p class="m-0 text-sm text-gray-500">{{ getConfig(m.nom).description }}</p>
+          </div>
+        </div>
+
+        <!-- Templates (quand module actif) -->
+        <div *ngIf="m.activeForUser" class="mt-4 pt-4 border-t border-gray-100">
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+            Templates de soins inclus
+          </p>
+
+          <!-- Skeleton templates -->
+          <div *ngIf="loadingTemplates[m.id]" class="flex flex-col gap-2">
+            <app-skeleton height="32px" *ngFor="let i of [1,2,3]"
+                          className="rounded-lg"></app-skeleton>
+          </div>
+
+          <!-- Liste templates -->
+          <div *ngIf="!loadingTemplates[m.id]">
+            <div *ngIf="getTemplates(m.id).length === 0"
+                 class="text-xs text-gray-400 italic py-2">
+              Aucun template défini pour ce module.
+            </div>
+            <div *ngFor="let t of getTemplates(m.id)"
+                 class="flex items-center gap-2 py-1.5 px-3 rounded-lg mb-1"
+                 [class.bg-blue-50]="t.global"
+                 [class.bg-gray-50]="!t.global">
+              <mat-icon class="!text-base shrink-0"
+                        [class.text-blue-400]="t.global"
+                        [class.text-primary-light]="!t.global">
+                {{ t.global ? 'library_books' : 'edit_note' }}
+              </mat-icon>
+              <div class="flex-1 min-w-0">
+                <span class="text-sm font-medium text-gray-700">{{ t.nom }}</span>
+                <span class="text-xs text-gray-400 ml-1">· {{ t.type }}</span>
+              </div>
+              <!-- Badge global / personnel -->
+              <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded shrink-0"
+                    [class.bg-blue-100]="t.global" [class.text-blue-600]="t.global"
+                    [class.bg-gray-100]="!t.global" [class.text-gray-500]="!t.global">
+                {{ t.global ? 'Modèle' : 'Personnel' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bouton toggle -->
+        <div class="mt-4 flex justify-end">
+          <button mat-raised-button
+                  [color]="m.activeForUser ? 'warn' : 'primary'"
+                  (click)="toggleModule(m)">
+            <mat-icon>{{ m.activeForUser ? 'remove_circle' : 'add_circle' }}</mat-icon>
+            {{ m.activeForUser ? 'Désactiver' : 'Activer ce module' }}
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Message si aucun module -->
+  <div *ngIf="!loading && modules.length === 0"
+       class="text-center py-16 text-gray-400">
+    <mat-icon class="!text-[64px] !w-16 !h-16">extension_off</mat-icon>
+    <p>Aucun module disponible.</p>
+  </div>
+</div>
+
+
