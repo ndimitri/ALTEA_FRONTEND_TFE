@@ -1,4 +1,4 @@
-<div class="p-4 md:p-6 relative">
+<div class="p-4 md:p-6">
   <!-- Header -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
     <div>
@@ -11,41 +11,337 @@
     </button>
   </div>
 
-  <mat-card class="p-4">
-    <full-calendar [options]="calendarOptions"></full-calendar>
-  </mat-card>
+  <!-- Layout : calendrier + panneau détail côte à côte -->
+  <div class="flex flex-col lg:flex-row gap-4 items-start">
 
-  <!-- Panneau détail RDV -->
-  <div class="fixed right-6 top-24 w-[300px] z-[100]" *ngIf="selectedEvent">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>{{ selectedEvent.title }}</mat-card-title>
-        <mat-card-subtitle>{{ selectedEvent.extendedProps.statut }}</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <p *ngIf="selectedEvent.extendedProps.lieu" class="flex items-center gap-1">
-          <mat-icon class="!text-base">location_on</mat-icon>
-          {{ selectedEvent.extendedProps.lieu }}
-        </p>
-        <p *ngIf="selectedEvent.extendedProps.commentaire" class="flex items-center gap-1">
-          <mat-icon class="!text-base">notes</mat-icon>
-          {{ selectedEvent.extendedProps.commentaire }}
-        </p>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-button color="warn" (click)="deleteRdv(selectedEvent!.id)">
-          <mat-icon>delete</mat-icon>
-          Supprimer
-        </button>
-        <button mat-button (click)="selectedEvent = null">Fermer</button>
-      </mat-card-actions>
+    <!-- Calendrier — prend tout l'espace disponible -->
+    <mat-card class="p-4 flex-1 min-w-0">
+      <full-calendar [options]="calendarOptions"></full-calendar>
     </mat-card>
-  </div>
+
+    <!-- Panneau détail RDV — largeur fixe, toujours dans le DOM mais invisible si pas d'event -->
+    <div class="w-full lg:w-[380px] shrink-0 transition-all duration-300"
+         [class.opacity-0]="!selectedEvent"
+         [class.pointer-events-none]="!selectedEvent"
+         [class.invisible]="!selectedEvent">
+      <div class="flex flex-col gap-0 rounded-2xl overflow-hidden shadow-lg border border-gray-100">
+        <ng-container *ngIf="selectedEvent">
+
+          <!-- ───── MODE LECTURE ───── -->
+          <ng-container *ngIf="!editingRdv">
+
+            <!-- Hero coloré -->
+            <div class="px-5 pt-5 pb-4 text-white relative overflow-hidden"
+                 [style.background]="selectedEvent.color">
+              <div
+                  class="absolute right-3 top-3 opacity-10 text-[80px] leading-none select-none font-black">
+                RDV
+              </div>
+              <div class="flex items-start justify-between gap-2 relative z-10">
+                <div>
+                  <p class="text-white/70 text-xs font-medium uppercase tracking-widest mb-1">
+                    Rendez-vous
+                  </p>
+                  <h3 class="text-lg font-bold m-0 leading-tight">{{ selectedEvent.title }}</h3>
+                  <div class="flex items-center gap-1.5 mt-2 text-white/80 text-sm">
+                    <mat-icon class="!text-base">schedule</mat-icon>
+                    {{ selectedEvent.start | date:'EEE d MMM' }} ·
+                    {{ selectedEvent.start | date:'HH:mm' }}– {{ selectedEvent.end | date:'HH:mm' }}
+                  </div>
+                </div>
+                <button mat-icon-button class="text-white/80 hover:text-white shrink-0"
+                        (click)="selectedEvent = null; editingRdv = false">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <!-- Corps -->
+            <div class="bg-white flex flex-col">
+
+              <!-- Infos rapides -->
+              <div class="px-5 py-4 flex flex-col gap-2.5 border-b">
+
+                <!-- Statut -->
+                <div class="flex items-center gap-3">
+                  <div
+                      class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center shrink-0">
+                    <mat-icon class="!text-base"
+                              [class.text-green-500]="selectedEvent.extendedProps.statut === 'REALISE'"
+                              [class.text-red-500]="selectedEvent.extendedProps.statut === 'ANNULE'"
+                              [class.text-orange-400]="!selectedEvent.extendedProps.statut || selectedEvent.extendedProps.statut === 'PLANIFIE'">
+                      {{
+                        selectedEvent.extendedProps.statut === 'REALISE' ? 'check_circle' :
+                            selectedEvent.extendedProps.statut === 'ANNULE' ? 'cancel' : 'schedule'
+                      }}
+                    </mat-icon>
+                  </div>
+                  <div>
+                    <p class="text-[10px] text-gray-400 uppercase tracking-wider m-0">Statut</p>
+                    <p class="text-sm font-medium m-0"
+                       [class.text-green-600]="selectedEvent.extendedProps.statut === 'REALISE'"
+                       [class.text-red-500]="selectedEvent.extendedProps.statut === 'ANNULE'"
+                       [class.text-orange-500]="!selectedEvent.extendedProps.statut || selectedEvent.extendedProps.statut === 'PLANIFIE'">
+                      {{ selectedEvent.extendedProps.statut || 'PLANIFIÉ' }}
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Lieu -->
+                <div class="flex items-center gap-3" *ngIf="selectedEvent.extendedProps.lieu">
+                  <div
+                      class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center shrink-0">
+                    <mat-icon class="!text-base text-gray-400">location_on</mat-icon>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-[10px] text-gray-400 uppercase tracking-wider m-0">Lieu</p>
+                    <p class="text-sm text-gray-700 m-0 truncate">{{ selectedEvent.extendedProps.lieu }}</p>
+                  </div>
+                </div>
+
+                <!-- Commentaire -->
+                <div class="flex items-start gap-3" *ngIf="selectedEvent.extendedProps.commentaire">
+                  <div
+                      class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 mt-0.5">
+                    <mat-icon class="!text-base text-gray-400">notes</mat-icon>
+                  </div>
+                  <div>
+                    <p class="text-[10px] text-gray-400 uppercase tracking-wider m-0">
+                      Commentaire</p>
+                    <p class="text-sm text-gray-700 m-0 leading-snug">{{ selectedEvent.extendedProps.commentaire }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section Soins -->
+              <div class="px-5 py-4 border-b">
+                <div class="flex items-center justify-between mb-3">
+                  <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider m-0 flex items-center gap-1.5">
+                    <mat-icon class="!text-sm">medical_services</mat-icon>
+                    Soins ({{ rdvSoins.length }})
+                  </p>
+                  <button mat-stroked-button class="!text-xs !h-7 !px-2" *ngIf="!showAddSoinToRdv"
+                          (click)="openAddSoinPanel()">
+                    <mat-icon class="!text-sm">add</mat-icon>
+                    Ajouter
+                  </button>
+                </div>
+
+                <!-- Liste soins -->
+                <div class="flex flex-col gap-1.5">
+                  <div *ngFor="let s of rdvSoins"
+                       class="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-gray-50 group">
+                    <mat-icon class="!text-base text-primary-light shrink-0">healing</mat-icon>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-medium text-gray-800 m-0 truncate">{{ s.type }}</p>
+                      <p class="text-xs text-gray-400 m-0 truncate"
+                         *ngIf="s.description">{{ s.description }}</p>
+                    </div>
+                    <button mat-icon-button color="warn"
+                            class="!w-7 !h-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                            (click)="removeSoinFromRdv(s.id!)">
+                      <mat-icon class="!text-sm">delete</mat-icon>
+                    </button>
+                  </div>
+                  <p *ngIf="rdvSoins.length === 0 && !showAddSoinToRdv"
+                     class="text-xs text-gray-400 italic text-center py-2">Aucun soin attaché</p>
+                </div>
+
+                <!-- Panneau ajout soin -->
+                <div *ngIf="showAddSoinToRdv"
+                     class="mt-3 p-3 rounded-xl border border-dashed border-gray-200 bg-gray-50">
+                  <div class="flex rounded-lg overflow-hidden border border-gray-200 text-xs mb-3">
+                    <button type="button" class="flex-1 py-1.5 font-medium transition-colors"
+                            [class.bg-primary]="addSoinMode === 'existing'"
+                            [class.text-white]="addSoinMode === 'existing'"
+                            [class.text-gray-500]="addSoinMode !== 'existing'"
+                            (click)="addSoinMode = 'existing'">Existant
+                    </button>
+                    <button type="button"
+                            class="flex-1 py-1.5 font-medium border-l border-gray-200 transition-colors"
+                            [class.bg-primary]="addSoinMode === 'new'"
+                            [class.text-white]="addSoinMode === 'new'"
+                            [class.text-gray-500]="addSoinMode !== 'new'"
+                            (click)="addSoinMode = 'new'">Nouveau
+                    </button>
+                  </div>
+
+                  <ng-container *ngIf="addSoinMode === 'existing'">
+                    <p class="text-xs text-gray-400 italic" *ngIf="patientSoins.length === 0">
+                      Ce patient n'a pas encore de soins enregistrés.
+                    </p>
+                    <mat-form-field appearance="outline" class="w-full"
+                                    *ngIf="patientSoins.length > 0">
+                      <mat-label>Choisir un soin</mat-label>
+                      <mat-select [(ngModel)]="selectedExistingSoinId"
+                                  [ngModelOptions]="{standalone: true}">
+                        <mat-option *ngFor="let s of patientSoins" [value]="s.id">
+                          {{ s.type }}<span class="text-gray-400 ml-1"
+                                            *ngIf="s.description"> — {{ s.description }}</span>
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                    <div class="flex gap-2 justify-end mt-1">
+                      <button mat-button type="button" class="!text-xs"
+                              (click)="showAddSoinToRdv = false">Annuler
+                      </button>
+                      <button mat-raised-button color="primary" type="button" class="!text-xs"
+                              [disabled]="!selectedExistingSoinId" (click)="attachExistingSoin()">
+                        Attacher
+                      </button>
+                    </div>
+                  </ng-container>
+
+                  <ng-container *ngIf="addSoinMode === 'new'">
+                    <form [formGroup]="rdvSoinForm" (ngSubmit)="addSoinToRdv()"
+                          class="flex flex-col gap-2">
+                      <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>Template</mat-label>
+                        <mat-select (selectionChange)="applyRdvTemplate($event.value)">
+                          <mat-option [value]="null">-- Aucun --</mat-option>
+                          <mat-option *ngFor="let t of templates" [value]="t">{{ t.nom }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>Type *</mat-label>
+                        <input matInput formControlName="type">
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>Description</mat-label>
+                        <textarea matInput formControlName="description" rows="2"></textarea>
+                      </mat-form-field>
+                      <div class="flex gap-2 justify-end">
+                        <button mat-button type="button" class="!text-xs"
+                                (click)="showAddSoinToRdv = false">Annuler
+                        </button>
+                        <button mat-raised-button color="primary" type="submit" class="!text-xs"
+                                [disabled]="rdvSoinForm.invalid">Ajouter
+                        </button>
+                      </div>
+                    </form>
+                  </ng-container>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="px-5 py-3 flex items-center justify-between gap-2">
+                <button mat-stroked-button color="warn" class="!text-xs"
+                        (click)="deleteRdv(selectedEvent!.id)">
+                  <mat-icon class="!text-sm">delete</mat-icon>
+                  Supprimer
+                </button>
+                <button mat-raised-button color="primary" class="!text-xs"
+                        (click)="openEditRdv()">
+                  <mat-icon class="!text-sm">edit</mat-icon>
+                  Modifier
+                </button>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- ───── MODE ÉDITION ───── -->
+          <ng-container *ngIf="editingRdv">
+            <!-- Header édition -->
+            <div class="px-5 pt-5 pb-4 bg-gray-800 text-white flex items-center justify-between">
+              <div>
+                <p class="text-white/60 text-xs uppercase tracking-widest m-0">Modification</p>
+                <h3 class="text-base font-bold m-0 mt-0.5">{{ selectedEvent!.title }}</h3>
+              </div>
+              <button mat-icon-button class="text-white/70 hover:text-white"
+                      (click)="editingRdv = false">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+
+            <!-- Formulaire édition -->
+            <div class="bg-white p-5">
+              <form [formGroup]="editRdvForm" (ngSubmit)="submitEditRdv()"
+                    class="flex flex-col gap-3">
+
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Patient</mat-label>
+                  <mat-select formControlName="patientId">
+                    <mat-option *ngFor="let p of patients" [value]="p.id">
+                      {{ p.prenom }} {{ p.nom }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Début</mat-label>
+                    <input matInput type="datetime-local" formControlName="dateHeureDebut">
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Fin</mat-label>
+                    <input matInput type="datetime-local" formControlName="dateHeureFin">
+                  </mat-form-field>
+                </div>
+
+                <!-- Lieu autocomplete -->
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Lieu (si différent du domicile)</mat-label>
+                  <input matInput formControlName="lieuInput" [matAutocomplete]="lieuEditAuto"
+                         placeholder="Rue, code postal, ville...">
+                  <mat-autocomplete #lieuEditAuto="matAutocomplete"
+                                    (optionSelected)="selectLieuEdit($event.option.value)">
+                    <mat-option *ngFor="let a of lieuSuggestionsEdit" [value]="a">
+                      {{ a.address.road }} {{ a.address.house_number }},
+                      {{ a.address.postcode }} {{ a.address.town ?? a.address.county }}
+                    </mat-option>
+                  </mat-autocomplete>
+                  <mat-icon matSuffix>location_on</mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Commentaire</mat-label>
+                  <textarea matInput formControlName="commentaire" rows="2"></textarea>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>Statut</mat-label>
+                  <mat-select formControlName="statut">
+                    <mat-option value="PLANIFIE">Planifié</mat-option>
+                    <mat-option value="REALISE">Réalisé</mat-option>
+                    <mat-option value="ANNULE">Annulé</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <!-- Couleur -->
+                <div class="flex items-center gap-3">
+                  <span class="text-sm text-gray-600">Couleur :</span>
+                  <div class="flex gap-2 flex-wrap">
+                    <div *ngFor="let c of colors"
+                         class="w-7 h-7 rounded-full cursor-pointer transition-all border-2"
+                         [style.background]="c"
+                         [class.border-gray-700]="editRdvForm.get('couleur')?.value === c"
+                         [class.border-transparent]="editRdvForm.get('couleur')?.value !== c"
+                         [class.scale-110]="editRdvForm.get('couleur')?.value === c"
+                         (click)="editRdvForm.patchValue({couleur: c})"></div>
+                  </div>
+                </div>
+
+                <div class="flex gap-2 justify-end pt-1">
+                  <button mat-button type="button" (click)="editingRdv = false">Annuler</button>
+                  <button mat-raised-button color="primary" type="submit"
+                          [disabled]="editRdvForm.invalid">
+                    <mat-icon class="!text-sm">save</mat-icon>
+                    Enregistrer
+                  </button>
+                </div>
+              </form>
+            </div>
+          </ng-container>
+        </ng-container><!-- fin *ngIf="selectedEvent" -->
+      </div><!-- fin rounded-2xl -->
+    </div><!-- fin w-[380px] -->
+  </div><!-- fin flex layout -->
 
   <!-- Dialog création RDV -->
   <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]"
        *ngIf="showCreateDialog" (click)="closeDialog()">
-    <mat-card class="w-[480px] max-w-[95vw] max-h-[90vh] overflow-y-auto"
+    <mat-card class="w-[520px] max-w-[95vw] max-h-[90vh] overflow-y-auto"
               (click)="$event.stopPropagation()">
       <mat-card-header>
         <mat-card-title>Nouveau rendez-vous</mat-card-title>
@@ -69,10 +365,20 @@
             <input matInput type="datetime-local" formControlName="dateHeureFin">
           </mat-form-field>
           <mat-form-field appearance="outline" class="w-full mb-3">
-            <mat-label>Lieu (optionnel)</mat-label>
-            <input matInput formControlName="lieu" placeholder="Adresse du patient...">
+            <mat-label>Lieu (si différent du domicile)</mat-label>
+            <input matInput formControlName="lieuInput" [matAutocomplete]="lieuAuto"
+                   placeholder="Rue numéro, code postal ville">
+            <mat-autocomplete #lieuAuto="matAutocomplete"
+                              (optionSelected)="selectLieu($event.option.value)">
+              <mat-option *ngFor="let a of lieuSuggestions" [value]="a">
+                {{ a.address.road }} {{ a.address.house_number }}, {{ a.address.postcode }} {{
+                  a.address.town ? a.address.town : a.address.county
+                }}
+              </mat-option>
+            </mat-autocomplete>
             <mat-icon matSuffix>location_on</mat-icon>
           </mat-form-field>
+
           <mat-form-field appearance="outline" class="w-full mb-3">
             <mat-label>Commentaire</mat-label>
             <textarea matInput formControlName="commentaire" rows="2"></textarea>
@@ -88,6 +394,135 @@
                    [class.border-transparent]="rdvForm.get('couleur')?.value !== c"
                    [class.scale-110]="rdvForm.get('couleur')?.value === c"
                    (click)="rdvForm.patchValue({couleur: c})"></div>
+            </div>
+          </div>
+
+          <!-- Section Soins à associer -->
+          <div class="border rounded-lg p-3 mb-4 bg-gray-50">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-semibold text-gray-700 flex items-center gap-1">
+                <mat-icon class="!text-base">medical_services</mat-icon>
+                Soins associés
+                <span class="ml-1 text-xs text-gray-400"
+                      *ngIf="pendingSoins.length > 0">({{ pendingSoins.length }})</span>
+              </span>
+              <button mat-stroked-button type="button" class="!text-xs !h-8"
+                      (click)="showPendingSoinForm = !showPendingSoinForm; pendingSoinMode = 'new'">
+                <mat-icon class="!text-sm">add</mat-icon>
+                Ajouter un soin
+              </button>
+            </div>
+
+            <!-- Liste des soins en attente -->
+            <div *ngIf="pendingSoins.length > 0" class="flex flex-col gap-1 mb-2">
+              <div *ngFor="let s of pendingSoins; let i = index"
+                   class="flex items-center gap-2 bg-white rounded px-2 py-1 border">
+                <mat-icon class="!text-sm text-primary-light">healing</mat-icon>
+                <span class="text-sm font-medium flex-1">{{ s.type }}</span>
+                <span class="text-xs text-gray-400" *ngIf="s.description">{{ s.description }}</span>
+                <button mat-icon-button type="button" color="warn" class="!w-6 !h-6"
+                        (click)="removePendingSoin(i)">
+                  <mat-icon class="!text-sm">close</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <p class="text-xs text-gray-400 italic"
+               *ngIf="pendingSoins.length === 0 && !showPendingSoinForm">
+              Aucun soin — vous pourrez en ajouter après création
+            </p>
+
+            <!-- Panneau d'ajout soin -->
+            <div *ngIf="showPendingSoinForm" class="border-t pt-2 flex flex-col gap-2">
+
+              <!-- Toggle existant / nouveau (seulement si patient sélectionné) -->
+              <div class="flex rounded overflow-hidden border text-sm"
+                   *ngIf="rdvForm.get('patientId')?.value">
+                <button type="button"
+                        class="flex-1 py-1 transition-colors"
+                        [class.bg-primary]="pendingSoinMode === 'existing'"
+                        [class.text-white]="pendingSoinMode === 'existing'"
+                        [class.text-gray-600]="pendingSoinMode !== 'existing'"
+                        (click)="pendingSoinMode = 'existing'; loadPatientSoinsForDialog()">
+                  Soin existant
+                </button>
+                <button type="button"
+                        class="flex-1 py-1 border-l transition-colors"
+                        [class.bg-primary]="pendingSoinMode === 'new'"
+                        [class.text-white]="pendingSoinMode === 'new'"
+                        [class.text-gray-600]="pendingSoinMode !== 'new'"
+                        (click)="pendingSoinMode = 'new'">
+                  Nouveau soin
+                </button>
+              </div>
+
+              <!-- MODE : Soin existant -->
+              <ng-container
+                  *ngIf="pendingSoinMode === 'existing' && rdvForm.get('patientId')?.value">
+                <p class="text-xs text-gray-400" *ngIf="patientSoinsForDialog.length === 0">
+                  Ce patient n'a pas encore de soins enregistrés.
+                </p>
+                <mat-form-field appearance="outline" class="w-full"
+                                *ngIf="patientSoinsForDialog.length > 0">
+                  <mat-label>Choisir un soin du patient</mat-label>
+                  <mat-select [(ngModel)]="selectedDialogSoin"
+                              [ngModelOptions]="{standalone: true}">
+                    <mat-option *ngFor="let s of patientSoinsForDialog" [value]="s">
+                      <span class="font-medium">{{ s.type }}</span>
+                      <span class="text-xs text-gray-400 ml-2"
+                            *ngIf="s.description">— {{ s.description }}</span>
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <div class="flex gap-2 justify-end">
+                  <button mat-button type="button"
+                          (click)="showPendingSoinForm = false">Annuler
+                  </button>
+                  <button mat-stroked-button color="primary" type="button"
+                          [disabled]="!selectedDialogSoin"
+                          (click)="addExistingSoinToPending()">
+                    <mat-icon>add</mat-icon>
+                    Ajouter
+                  </button>
+                </div>
+              </ng-container>
+
+              <!-- MODE : Nouveau soin -->
+              <ng-container *ngIf="pendingSoinMode === 'new' || !rdvForm.get('patientId')?.value">
+                <div [formGroup]="pendingSoinForm" class="flex flex-col gap-2">
+                  <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Utiliser un template</mat-label>
+                    <mat-select formControlName="templateId"
+                                (selectionChange)="applyPendingTemplate($event.value)">
+                      <mat-option [value]="null">-- Aucun --</mat-option>
+                      <mat-option *ngFor="let t of templates" [value]="t">{{ t.nom }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Type de soin *</mat-label>
+                    <input matInput formControlName="type" placeholder="Pansement, injection...">
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Description</mat-label>
+                    <textarea matInput formControlName="description" rows="2"></textarea>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Notes</mat-label>
+                    <textarea matInput formControlName="notes" rows="1"></textarea>
+                  </mat-form-field>
+                  <div class="flex gap-2 justify-end">
+                    <button mat-button type="button"
+                            (click)="showPendingSoinForm = false; pendingSoinForm.reset()">Annuler
+                    </button>
+                    <button mat-stroked-button color="primary" type="button"
+                            [disabled]="pendingSoinForm.invalid"
+                            (click)="addPendingSoin()">
+                      <mat-icon>add</mat-icon>
+                      Ajouter
+                    </button>
+                  </div>
+                </div>
+              </ng-container>
             </div>
           </div>
 
