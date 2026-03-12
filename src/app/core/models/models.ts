@@ -40,21 +40,30 @@ export interface Patient {
 
 
 export interface Address {
-  house_number?: string;
+  houseNumber?: string;
   road?: string;
   town?: string;
   county?: string;
   region?: string;
   postcode?: string;
   country?: string;
-  country_code?: string;
+  countryCode?: string;
 }
 
 export interface AddressSuggestion {
   display_name: string;
   lat: string;
   lon: string;
-  address: Address
+  address: {
+    house_number?: string;
+    road?: string;
+    town?: string;
+    county?: string;
+    region?: string;
+    postcode?: string;
+    country?: string;
+    country_code?: string;
+  };
 }
 
 export interface RendezVous {
@@ -69,6 +78,7 @@ export interface RendezVous {
   patientNom?: string;
   patientPrenom?: string;
   patientAdresse?: string;
+  soins?: Soin[];
   createdAt?: string;
 }
 
@@ -88,6 +98,18 @@ export interface CalendarEvent {
   };
 }
 
+export interface SoinTemplate {
+  id?: number;
+  nom: string;
+  type: string;
+  description?: string;
+  notes?: string;
+  moduleSpecifique?: string;
+  moduleId?: number;
+  moduleNom?: string;
+  global?: boolean;   // true = template partagé créé par l'admin, false/absent = template personnel
+}
+
 export interface Soin {
   id?: number;
   type: string;
@@ -99,6 +121,7 @@ export interface Soin {
   patientNom?: string;
   moduleId?: number;
   moduleNom?: string;
+  rendezVousId?: number;
   createdAt?: string;
 }
 
