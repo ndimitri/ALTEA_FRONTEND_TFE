@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
 import {MatCardModule} from '@angular/material/card';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
@@ -48,7 +49,6 @@ import {
   MatExpansionPanelTitle
 } from '@angular/material/expansion';
 
-// id présent = soin existant à lier, id absent = nouveau soin à créer
 interface PendingSoin {
   id?: number;
   type: string;
@@ -64,8 +64,7 @@ interface PendingSoin {
     MatCardModule, MatButtonModule, MatIconModule, MatDialogModule,
     MatFormFieldModule, MatInputModule, MatSelectModule,
     MatSnackBarModule, MatChipsModule, MatAutocompleteModule,
-    MatTooltipModule, MatDividerModule,
-    MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle
+    MatTooltipModule, MatDividerModule
   ],
   templateUrl: './planning.component.html',
   styleUrl: './planning.component.scss'
@@ -78,6 +77,8 @@ export class PlanningComponent implements OnInit {
   patients: Patient[] = [];
   rdvForm!: FormGroup;
   colors = ['#1F5C8B', '#2196F3', '#4CAF50', '#FF9800', '#9C27B0', '#F44336', '#00BCD4'];
+  selectedColor = '#1F5C8B';   // pour le dialog création
+  selectedEditColor = '#1F5C8B'; // pour le panneau édition
   preselectedDates: { start: string; end: string } | null = null;
 
   lieuSuggestions: AddressSuggestion[] = [];
@@ -111,7 +112,9 @@ export class PlanningComponent implements OnInit {
       private soinService: SoinService,
       private geocodingService: GeocodingService,
       private fb: FormBuilder,
-      private snackBar: MatSnackBar
+      private snackBar: MatSnackBar,
+      private route: ActivatedRoute,
+      private router: Router
   ) {
   }
 
@@ -154,13 +157,59 @@ export class PlanningComponent implements OnInit {
     });
 
     this.rdvForm.get('lieuInput')?.valueChanges.pipe(
-        debounceTime(400),
-        distinctUntilChanged(),
+        debounceTime(400), distinctUntilChanged(),
         switchMap(v => {
           if (!v || v.length < 3) return [];
           return this.geocodingService.searchAddress(v);
         })
     ).subscribe(results => this.lieuSuggestions = results);
+
+    // Ouvrir automatiquement le détail d'un RDV si ?rdvId= est présent dans l'URL
+    this.route.queryParams.subscribe(params => {
+      const rdvId = Number(params['rdvId']);
+      if (rdvId) {
+        this.rdvService.getById(rdvId).subscribe({
+          next: rdv => {
+            this.selectedEvent = {
+              id: rdv.id!,
+              title: `${rdv.patientPrenom ?? ''} ${rdv.patientNom ?? ''}`.trim(),
+              start: rdv.dateHeureDebut,
+              end: rdv.dateHeureFin,
+              color: rdv.couleur ?? '#1F5C8B',
+              allDay: false,
+              extendedProps: {
+                patientId: rdv.patientId,
+                patientNom: rdv.patientNom ?? '',
+                lieu: rdv.lieu ? this.formatLieu(rdv.lieu) : '',
+                statut: rdv.statut ?? 'PLANIFIE',
+                commentaire: rdv.commentaire ?? '',
+              }
+            };
+            this.soinService.getByRdv(rdv.id!).subscribe(s => this.rdvSoins = s);
+            this.soinService.getByPatient(rdv.patientId).subscribe(s => this.patientSoins = s);
+            // Nettoyer l'URL sans rechargement
+            this.router.navigate([], {queryParams: {}, replaceUrl: true});
+          },
+          error: () => {
+          }
+        });
+      }
+    });
+  }
+
+  private formatLieu(lieu: any): string {
+    if (!lieu || typeof lieu !== 'object') return '';
+    return `${lieu.road ?? ''} ${lieu.houseNumber ?? ''}, ${lieu.postcode ?? ''} ${lieu.town ?? lieu.county ?? ''}`.trim().replace(/^,\s*/, '');
+  }
+
+  selectColor(c: string): void {
+    this.selectedColor = c;
+    this.rdvForm.patchValue({couleur: c});
+  }
+
+  selectEditColor(c: string): void {
+    this.selectedEditColor = c;
+    this.editRdvForm.patchValue({couleur: c});
   }
 
   initForm(): void {
@@ -206,7 +255,14 @@ export class PlanningComponent implements OnInit {
 
       events: (info, successCb, failureCb) => {
         this.rdvService.getForCalendar(info.startStr, info.endStr).subscribe({
-          next: (events: CalendarEvent[]) => successCb(events.map(e => ({...e, id: String(e.id)}))),
+          next: (events: CalendarEvent[]) => successCb(events.map(e => {
+            // Couleur selon statut : custom si PLANIFIE, vert si REALISE, rouge si ANNULE
+            const statut = e.extendedProps?.statut;
+            const color = statut === 'REALISE' ? '#4CAF50'
+                : statut === 'ANNULE' ? '#F44336'
+                    : (e.color || '#1F5C8B');
+            return {...e, id: String(e.id), color, backgroundColor: color, borderColor: color};
+          })),
           error: failureCb
         });
       },
@@ -304,6 +360,7 @@ export class PlanningComponent implements OnInit {
     this.patientSoinsForDialog = [];
     this.selectedDialogSoin = null;
     this.lieuSuggestions = [];
+    this.selectedColor = '#1F5C8B';
     this.rdvForm.reset({couleur: '#1F5C8B'});
     this.pendingSoinForm.reset();
   }
@@ -395,6 +452,7 @@ export class PlanningComponent implements OnInit {
       couleur: this.selectedEvent.color,
       statut: ep['statut'] ?? 'PLANIFIE'
     });
+    this.selectedEditColor = this.selectedEvent.color;
   }
 
   selectLieuEdit(suggestion: AddressSuggestion): void {

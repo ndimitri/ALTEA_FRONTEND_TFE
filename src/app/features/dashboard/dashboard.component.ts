@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {MatCardModule} from '@angular/material/card';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
@@ -51,8 +51,14 @@ export class DashboardComponent implements OnInit {
       private patientService: PatientService,
       private rdvService: RendezVousService,
       private moduleService: ModuleService,
-      private soinService: SoinService
+      private soinService: SoinService,
+      private router: Router
   ) {
+  }
+
+  goToPlanning(rdvId: number): void {
+    this.closeRdvDetail();
+    this.router.navigate(['/planning'], {queryParams: {rdvId}});
   }
 
   ngOnInit(): void {

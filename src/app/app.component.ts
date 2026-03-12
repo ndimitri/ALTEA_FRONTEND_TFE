@@ -1,5 +1,5 @@
 import {Component, HostListener, OnInit} from '@angular/core';
-import {Router, RouterOutlet, RouterLink, RouterLinkActive, NavigationEnd} from '@angular/router';
+import {Router, RouterOutlet, RouterLink, RouterLinkActive} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatButtonModule} from '@angular/material/button';
@@ -169,14 +169,10 @@ export class AppComponent implements OnInit {
       if (user) this.loadActiveModules();
       else this.activeModules = [];
     });
-    // Recharger les modules actifs quand on quitte /modules (pour mettre à jour la navbar)
-    this.router.events.pipe(
-        filter(e => e instanceof NavigationEnd)
-    ).subscribe((e: any) => {
-      if (this.currentUser && !e.url.startsWith('/login')) {
-        this.loadActiveModules();
-      }
-    });
+    // Recharger la navbar à chaque activation/désactivation de module (temps réel)
+    this.moduleService.modulesChanged$.pipe(
+        filter(() => !!this.currentUser)
+    ).subscribe(() => this.loadActiveModules());
   }
 
   ngOnInit(): void {

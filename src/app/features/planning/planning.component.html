@@ -312,13 +312,15 @@
                 <div class="flex items-center gap-3">
                   <span class="text-sm text-gray-600">Couleur :</span>
                   <div class="flex gap-2 flex-wrap">
-                    <div *ngFor="let c of colors"
-                         class="w-7 h-7 rounded-full cursor-pointer transition-all border-2"
-                         [style.background]="c"
-                         [class.border-gray-700]="editRdvForm.get('couleur')?.value === c"
-                         [class.border-transparent]="editRdvForm.get('couleur')?.value !== c"
-                         [class.scale-110]="editRdvForm.get('couleur')?.value === c"
-                         (click)="editRdvForm.patchValue({couleur: c})"></div>
+                    <button type="button" *ngFor="let c of colors"
+                            class="w-7 h-7 rounded-full cursor-pointer transition-all border-2 hover:scale-110 focus:outline-none"
+                            [style.background]="c"
+                            [style.border-color]="selectedEditColor === c ? '#1a1a1a' : 'transparent'"
+                            [class.scale-110]="selectedEditColor === c"
+                            [class.ring-2]="selectedEditColor === c"
+                            [class.ring-offset-1]="selectedEditColor === c"
+                            [class.ring-gray-700]="selectedEditColor === c"
+                            (click)="selectEditColor(c)"></button>
                   </div>
                 </div>
 
@@ -387,13 +389,15 @@
           <div class="flex items-center gap-3 mb-4">
             <label class="text-sm text-gray-600">Couleur :</label>
             <div class="flex gap-2">
-              <div *ngFor="let c of colors"
-                   class="w-7 h-7 rounded-full cursor-pointer transition-transform hover:scale-110 border-2"
-                   [style.background]="c"
-                   [class.border-gray-800]="rdvForm.get('couleur')?.value === c"
-                   [class.border-transparent]="rdvForm.get('couleur')?.value !== c"
-                   [class.scale-110]="rdvForm.get('couleur')?.value === c"
-                   (click)="rdvForm.patchValue({couleur: c})"></div>
+              <button type="button" *ngFor="let c of colors"
+                      class="w-7 h-7 rounded-full cursor-pointer transition-all border-2 hover:scale-110 focus:outline-none"
+                      [style.background]="c"
+                      [style.border-color]="selectedColor === c ? '#1a1a1a' : 'transparent'"
+                      [class.scale-110]="selectedColor === c"
+                      [class.ring-2]="selectedColor === c"
+                      [class.ring-offset-1]="selectedColor === c"
+                      [class.ring-gray-700]="selectedColor === c"
+                      (click)="selectColor(c)"></button>
             </div>
           </div>
 

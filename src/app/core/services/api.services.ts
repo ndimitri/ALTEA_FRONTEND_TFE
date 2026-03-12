@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {environment} from '../../../environments/environment';
 import {Patient, RendezVous, CalendarEvent, Soin, Module, SoinTemplate} from '../models/models';
 
@@ -157,6 +157,9 @@ export class SoinService {
 export class ModuleService {
   private url = `${environment.apiUrl}/modules`;
 
+  /** Émet chaque fois qu'un module est activé ou désactivé → la navbar se met à jour */
+  readonly modulesChanged$ = new BehaviorSubject<void>(undefined);
+
   constructor(private http: HttpClient) {
   }
 
@@ -165,11 +168,29 @@ export class ModuleService {
   }
 
   activer(id: number): Observable<void> {
-    return this.http.post<void>(`${this.url}/${id}/activer`, {});
+    return new Observable(obs => {
+      this.http.post<void>(`${this.url}/${id}/activer`, {}).subscribe({
+        next: v => {
+          this.modulesChanged$.next();
+          obs.next(v);
+          obs.complete();
+        },
+        error: e => obs.error(e)
+      });
+    });
   }
 
   desactiver(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.url}/${id}/desactiver`);
+    return new Observable(obs => {
+      this.http.delete<void>(`${this.url}/${id}/desactiver`).subscribe({
+        next: v => {
+          this.modulesChanged$.next();
+          obs.next(v);
+          obs.complete();
+        },
+        error: e => obs.error(e)
+      });
+    });
   }
 }
 
