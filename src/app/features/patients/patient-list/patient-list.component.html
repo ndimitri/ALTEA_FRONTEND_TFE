@@ -18,8 +18,17 @@
     <mat-icon matSuffix>search</mat-icon>
   </mat-form-field>
 
-  <div class="flex justify-center py-12" *ngIf="loading">
-    <mat-spinner diameter="40"></mat-spinner>
+  <!-- Skeleton loaders -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4" *ngIf="loading">
+    <mat-card *ngFor="let i of [1,2,3,4,5,6]" class="p-4">
+      <div class="flex items-center gap-4">
+        <app-skeleton height="48px" width="48px" className="rounded-full shrink-0"></app-skeleton>
+        <div class="flex-1">
+          <app-skeleton height="16px" width="70%" className="mb-2"></app-skeleton>
+          <app-skeleton height="12px" width="50%"></app-skeleton>
+        </div>
+      </div>
+    </mat-card>
   </div>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4" *ngIf="!loading">

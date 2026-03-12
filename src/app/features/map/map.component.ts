@@ -108,7 +108,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
             .bindPopup(`
             <div style="min-width:160px">
               <strong>${p.prenom} ${p.nom}</strong><br>
-              ${p.address ? `<small> ${p.address.road} ${p.address.house_number}
+              ${p.address ? `<small> ${p.address.road} ${p.address.houseNumber}
                   , ${p.address.postcode}</small><br>` : ''}
               ${p.telephone ? `📞 ${p.telephone}` : ''}
             </div>

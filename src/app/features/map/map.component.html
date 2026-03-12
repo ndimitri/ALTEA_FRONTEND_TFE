@@ -55,7 +55,7 @@
               <div>
                 <div class="font-medium text-sm">{{ p.prenom }} {{ p.nom }}</div>
                 <div class="text-xs text-gray-400"
-                     *ngIf="p.address">{{ p.address.house_number }} {{ p.address.road }}
+                     *ngIf="p.address">{{ p.address.houseNumber }} {{ p.address.road }}
                   , {{ p.address.postcode }} {{
                     p.address.town ? p.address.town : p.address.county
                   }}
