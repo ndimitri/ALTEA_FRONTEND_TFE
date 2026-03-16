@@ -7,6 +7,8 @@ export interface User {
   prenom: string;
   role: 'ROLE_USER' | 'ROLE_ADMIN';
   modulesActifs: string[];
+  telephone?: string;
+  actif?: boolean;
 }
 
 export interface AuthResponse {
@@ -18,6 +20,15 @@ export interface AuthResponse {
   prenom: string;
   role: string;
   modulesActifs: string[];
+  telephone?: string;
+  actif?: boolean;
+}
+
+export interface UserProfileUpdatePayload {
+  nom: string;
+  prenom: string;
+  email: string;
+  telephone?: string;
 }
 
 export interface Patient {

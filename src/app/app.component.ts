@@ -1,5 +1,5 @@
-import {Component, HostListener, OnInit} from '@angular/core';
-import {Router, RouterOutlet, RouterLink, RouterLinkActive} from '@angular/router';
+import {Component, HostListener} from '@angular/core';
+import {RouterOutlet, RouterLink, RouterLinkActive} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatButtonModule} from '@angular/material/button';
@@ -83,12 +83,20 @@ import {filter} from 'rxjs/operators';
             </a>
           </mat-nav-list>
           <!-- Footer -->
-          <div class="flex items-center justify-between px-4 py-3 border-t border-white/15">
-            <div class="flex items-center gap-2 text-sm text-white/80">
-              <mat-icon class="!text-xl !w-5 !h-5">account_circle</mat-icon>
-              <span>{{ currentUser.prenom }} {{ currentUser.nom }}</span>
-            </div>
-            <button mat-icon-button (click)="logout()" title="Déconnexion" class="text-white/70">
+          <div class="flex items-center justify-between px-4 py-3 border-t border-white/15 gap-2">
+            <button
+                mat-button
+                class="user-profile-trigger"
+                [routerLink]="'/profile'"
+                (click)="isMobile && sidenav.close()"
+                title="Mon profil">
+              <span class="flex items-center gap-2 text-sm min-w-0">
+                <mat-icon class="!text-xl !w-5 !h-5">account_circle</mat-icon>
+                <span class="truncate">{{ currentUser.prenom }} {{ currentUser.nom }}</span>
+              </span>
+            </button>
+            <button mat-icon-button (click)="logout()" title="Déconnexion"
+                    class="text-white/70 shrink-0">
               <mat-icon>logout</mat-icon>
             </button>
           </div>
@@ -136,9 +144,21 @@ import {filter} from 'rxjs/operators';
     mat-nav-list a.active-link mat-icon {
       color: #64B5F6;
     }
+
+    .user-profile-trigger {
+      justify-content: flex-start;
+      min-width: 0;
+      flex: 1;
+      padding-inline: 0 !important;
+      color: rgba(255, 255, 255, 0.86) !important;
+    }
+
+    .user-profile-trigger:hover {
+      color: white !important;
+    }
   `]
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   currentUser: User | null = null;
   isAdmin = false;
   isMobile = window.innerWidth < 768;
@@ -159,9 +179,8 @@ export class AppComponent implements OnInit {
   }
 
   constructor(
-      private authService: AuthService,
-      private moduleService: ModuleService,
-      private router: Router
+      private readonly authService: AuthService,
+      private readonly moduleService: ModuleService
   ) {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
@@ -173,9 +192,6 @@ export class AppComponent implements OnInit {
     this.moduleService.modulesChanged$.pipe(
         filter(() => !!this.currentUser)
     ).subscribe(() => this.loadActiveModules());
-  }
-
-  ngOnInit(): void {
   }
 
   loadActiveModules(): void {
