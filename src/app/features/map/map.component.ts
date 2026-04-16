@@ -182,10 +182,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         const latlngs = result.geometry.map(([lng, lat]: [number, number]) => L.latLng(lat, lng));
 
         this.routeLayer = L.polyline(latlngs, {
-          color: '#FF6B35',
-          weight: 5,
-          opacity: 0.8,
-          dashArray: '10, 5'
+          color: '#2563EB',
+          weight: 6,
+          opacity: 0.95,
+          lineCap: 'round',
+          lineJoin: 'round',
+          // dashArray: '10, 5'
         }).addTo(this.map);
 
         this.map.fitBounds(this.routeLayer.getBounds(), {padding: [30, 30]});
