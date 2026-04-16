@@ -150,6 +150,59 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  private getSelectedRoutePoints(): [number, number][] {
+    return this.selectedPatients
+        .filter(p => p.latitude != null && p.longitude != null)
+        .map(p => [p.latitude as number, p.longitude as number]); // [lat, lng]
+  }
+
+  openInGoogleMaps(): void {
+    const points = this.getSelectedRoutePoints();
+    if (points.length < 2) {
+      this.snackBar.open('Selectionnez au moins 2 patients geolocalises', 'OK', {duration: 3000});
+      return;
+    }
+
+    const originPoint = points[0];
+    const destinationPoint = points.at(-1)!;
+    const origin = `${originPoint[0]},${originPoint[1]}`;
+    const destination = `${destinationPoint[0]},${destinationPoint[1]}`;
+    const waypoints = points
+        .slice(1, -1)
+        .map(([lat, lng]) => `${lat},${lng}`)
+        .join('|');
+
+    let url =
+        'https://www.google.com/maps/dir/?api=1' +
+        `&travelmode=driving` +
+        `&origin=${encodeURIComponent(origin)}` +
+        `&destination=${encodeURIComponent(destination)}`;
+
+    if (waypoints) {
+      url += `&waypoints=${encodeURIComponent(waypoints)}`;
+    }
+
+    window.open(url, '_blank', 'noopener');
+  }
+
+  openInWaze(): void {
+    const points = this.getSelectedRoutePoints();
+    if (points.length < 1) {
+      this.snackBar.open('Aucune destination geolocalisee disponible', 'OK', {duration: 3000});
+      return;
+    }
+
+    const [lat, lng] = points.at(-1)!;
+    const coords = `${lat},${lng}`;
+    const url = `https://waze.com/ul?ll=${encodeURIComponent(coords)}&navigate=yes`;
+
+    if (points.length > 2) {
+      this.snackBar.open('Waze ouvrira uniquement la destination finale', 'OK', {duration: 3500});
+    }
+
+    window.open(url, '_blank', 'noopener');
+  }
+
   calculateRoute(): void {
     if (this.selectedPatients.length < 2) return;
 

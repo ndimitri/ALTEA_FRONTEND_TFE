@@ -17,6 +17,21 @@
             <mat-icon *ngIf="!loadingRoute">directions</mat-icon>
             Calculer l'itinéraire
           </button>
+
+          <button mat-stroked-button color="primary"
+                  (click)="openInGoogleMaps()"
+                  [disabled]="selectedPatients.length < 2">
+            <mat-icon>map</mat-icon>
+            Google Maps
+          </button>
+
+          <button mat-stroked-button
+                  (click)="openInWaze()"
+                  [disabled]="selectedPatients.length < 1">
+            <mat-icon>navigation</mat-icon>
+            Waze
+          </button>
+
           <button mat-button (click)="clearRoute()" *ngIf="routeInfo">
             <mat-icon>clear</mat-icon>
             Effacer
